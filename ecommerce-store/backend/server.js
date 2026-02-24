@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ const allowedOrigins = process.env.CORS_ORIGIN
 app.use(
   cors(
     allowedOrigins.length
-      ? { origin: allowedOrigins, methods: ['GET'], optionsSuccessStatus: 200 }
+      ? { origin: allowedOrigins, methods: ['GET', 'POST', 'OPTIONS'], optionsSuccessStatus: 200 }
       : undefined
   )
 );
@@ -28,6 +29,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;

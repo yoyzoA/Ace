@@ -1,0 +1,56 @@
+{
+  "name": "ace-admin-desktop-app",
+  "version": "0.1.0",
+  "private": true,
+  "main": "electron/main.js",
+  "description": "Electron + React desktop admin console for product management.",
+  "author": "Ace",
+  "scripts": {
+    "dev:renderer": "vite --port 5173",
+    "dev:electron": "wait-on tcp:5173 && node electron/launch.js",
+    "dev": "concurrently -k \"npm:dev:renderer\" \"npm:dev:electron\"",
+    "build": "vite build",
+    "preview": "vite preview --port 5173",
+    "dist:win": "npm run build && electron-builder --win --x64"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.0",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.ace.admin",
+    "productName": "Ace Admin Console",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../admin-backend",
+        "to": "admin-backend"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  }
+}

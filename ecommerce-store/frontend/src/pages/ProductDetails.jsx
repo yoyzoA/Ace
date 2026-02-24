@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProductGrid from '../components/ProductGrid';
+import { useCart } from '../context/CartContext';
 import { getProductById, getProducts } from '../services/api';
 import { formatPrice } from '../utils/formatters';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { siteConfig } from '../data/siteConfig';
+import { getAvailableStock } from '../utils/inventory';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [status, setStatus] = useState('idle');
+  const { addItem } = useCart();
 
   usePageMeta({
     title: product ? product.name : 'Product Details',
@@ -68,6 +71,8 @@ const ProductDetails = () => {
   }, [id]);
 
   const highlightSpecs = product?.specs ? product.specs.slice(0, 4) : [];
+  const available = product ? getAvailableStock(product) : 0;
+  const isOutOfStock = available <= 0;
 
   return (
     <div className="container space-y-10 py-12">
@@ -107,7 +112,7 @@ const ProductDetails = () => {
                 )}
               </div>
               <div className="border-t border-line p-5 text-sm text-muted">
-                Catalog view only. Online checkout will be added soon.
+                Cash on delivery available. Orders are confirmed by the ACE team.
               </div>
             </div>
 
@@ -145,11 +150,16 @@ const ProductDetails = () => {
                 <button
                   type="button"
                   className="btn-primary"
-                  disabled
-                  title="Checkout coming soon"
+                  disabled={isOutOfStock}
+                  onClick={() => addItem(product.id, 1)}
                 >
-                  Save to cart
+                  Add to cart
                 </button>
+                {isOutOfStock ? (
+                  <span className="self-center text-xs font-semibold uppercase tracking-wide text-accentWarm">
+                    Out of stock
+                  </span>
+                ) : null}
                 <button
                   type="button"
                   className="btn-outline"

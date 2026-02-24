@@ -15,7 +15,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: true
+    featured: true,
+    stock: 8,
+    reserved: 0
   },
   {
     name: 'Vertex Pro 17 Creator Laptop',
@@ -33,7 +35,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: true
+    featured: true,
+    stock: 4,
+    reserved: 0
   },
   {
     name: 'Ionix RTX 4080 Trinity',
@@ -51,7 +55,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1618506469810-282bef2b30a2?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: true
+    featured: true,
+    stock: 6,
+    reserved: 0
   },
   {
     name: 'Prism 34 Ultrawide Monitor',
@@ -69,7 +75,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1510552776732-01acc9a4c7ec?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: false
+    featured: false,
+    stock: 0,
+    reserved: 0
   },
   {
     name: 'Helix X670 Carbon Motherboard',
@@ -87,7 +95,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: false
+    featured: false,
+    stock: 12,
+    reserved: 0
   },
   {
     name: 'Nimbus 2TB NVMe SSD',
@@ -105,7 +115,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1587202372775-f1f7c1a9ad9f?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: true
+    featured: true,
+    stock: 10,
+    reserved: 0
   },
   {
     name: 'Vector 850W Modular PSU',
@@ -123,7 +135,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: false
+    featured: false,
+    stock: 7,
+    reserved: 0
   },
   {
     name: 'PulseFlow 240 AIO Cooler',
@@ -141,7 +155,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1587202372583-493e4c95009b?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: false
+    featured: false,
+    stock: 5,
+    reserved: 0
   },
   {
     name: 'SignalPro WiFi 7 Router',
@@ -159,7 +175,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: true
+    featured: true,
+    stock: 9,
+    reserved: 0
   },
   {
     name: 'ArcLite Mechanical Keyboard',
@@ -177,7 +195,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: false
+    featured: false,
+    stock: 11,
+    reserved: 0
   },
   {
     name: 'Drift 7.1 Gaming Headset',
@@ -195,7 +215,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: false
+    featured: false,
+    stock: 3,
+    reserved: 0
   },
   {
     name: 'Clarity 27 4K Monitor',
@@ -213,7 +235,9 @@ const seedProducts = [
     images: [
       'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=1000&q=80'
     ],
-    featured: true
+    featured: true,
+    stock: 6,
+    reserved: 0
   }
 ];
 

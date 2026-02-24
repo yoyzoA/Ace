@@ -71,7 +71,7 @@ aws cloudfront create-distribution \
 
 After creation, update your frontend base URL:
 
-- Set `VITE_API_BASE_URL` to the Elastic Beanstalk URL (or custom domain).
+- Set `VITE_API_BASE_URL` to the HTTPS CloudFront API endpoint (for example: `https://d3gq8urup3ba6k.cloudfront.net`).
 - Rebuild and re-sync the `dist/` folder to S3.
 
 Replace placeholders in `deployment/cloudfront-distribution.json`:

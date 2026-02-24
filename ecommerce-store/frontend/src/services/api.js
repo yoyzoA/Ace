@@ -31,14 +31,24 @@ const buildQueryString = (params) => {
   return queryString ? `?${queryString}` : '';
 };
 
-const fetchJson = async (url) => {
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+const fetchJson = async (url, options = {}) => {
+  const response = await fetch(url, options);
+  const text = await response.text();
+  let payload = null;
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch (error) {
+      payload = null;
+    }
   }
 
-  return response.json();
+  if (!response.ok) {
+    const message = payload?.error || payload?.message || `Request failed: ${response.status}`;
+    throw new Error(message);
+  }
+
+  return payload;
 };
 
 export const getProducts = async (params = {}) => {
@@ -69,4 +79,17 @@ export const getProductById = async (id) => {
   assertApiBaseUrl();
   const payload = await fetchJson(`${API_BASE_URL}/api/products/${id}`);
   return normalizeProduct(payload.data);
+};
+
+export const placeOrder = async (payload) => {
+  if (USE_MOCK_DATA) {
+    throw new Error('Checkout requires the API backend.');
+  }
+
+  assertApiBaseUrl();
+  return fetchJson(`${API_BASE_URL}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
 };

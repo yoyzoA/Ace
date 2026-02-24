@@ -17,7 +17,9 @@ const productSchema = new mongoose.Schema(
     description: { type: String, default: '' },
     specs: { type: [specSchema], default: [] },
     images: { type: [String], default: [] },
-    featured: { type: Boolean, default: false }
+    featured: { type: Boolean, default: false },
+    stock: { type: Number, default: 0, min: 0 },
+    reserved: { type: Number, default: 0, min: 0 }
   },
   { timestamps: true }
 );
