@@ -11,10 +11,43 @@ if (!import.meta.env.VITE_ADMIN_API_BASE_URL) {
   console.warn(`VITE_ADMIN_API_BASE_URL is not set. Using ${DEFAULT_BASE_URL}.`);
 }
 
+const TOKEN_STORAGE_KEY = 'ace_admin_token';
+
+export const getToken = () => localStorage.getItem(TOKEN_STORAGE_KEY);
+export const setToken = (token) => localStorage.setItem(TOKEN_STORAGE_KEY, token);
+export const clearToken = () => localStorage.removeItem(TOKEN_STORAGE_KEY);
+
 const client = axios.create({
   baseURL: API_BASE_URL,
   timeout: 20000
 });
+
+client.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      clearToken();
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const login = async (email, password) => {
+  const response = await axios.post(`${API_BASE_URL}/admin/auth/login`, {
+    email,
+    password
+  });
+  setToken(response.data.token);
+  return response.data;
+};
 
 const normalizeListResponse = (data, key) => {
   if (Array.isArray(data)) {

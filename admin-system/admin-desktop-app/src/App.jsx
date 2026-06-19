@@ -2,9 +2,21 @@ import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import Orders from './pages/Orders';
 import Products from './pages/Products';
+import Login from './components/Login';
+import { clearToken, getToken } from './api/adminApi';
 
 export default function App() {
   const [activePage, setActivePage] = useState('dashboard');
+  const [authed, setAuthed] = useState(() => Boolean(getToken()));
+
+  if (!authed) {
+    return <Login onSuccess={() => setAuthed(true)} />;
+  }
+
+  const handleLogout = () => {
+    clearToken();
+    setAuthed(false);
+  };
 
   return (
     <div className="min-h-screen">
@@ -37,6 +49,14 @@ export default function App() {
               </button>
             ))}
           </nav>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-auto rounded-2xl border border-outline bg-panel/70 px-4 py-3 text-sm font-semibold text-ink"
+          >
+            Sign out
+          </button>
         </aside>
 
         <main className="flex-1 p-8">

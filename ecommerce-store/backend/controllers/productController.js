@@ -4,11 +4,11 @@ const Product = require('../models/Product');
 const buildFilters = (query) => {
   const filters = {};
 
-  if (query.category) {
+  if (typeof query.category === 'string' && query.category) {
     filters.category = query.category;
   }
 
-  if (query.brand) {
+  if (typeof query.brand === 'string' && query.brand) {
     filters.brand = query.brand;
   }
 

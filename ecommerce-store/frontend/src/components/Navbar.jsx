@@ -48,14 +48,6 @@ const Navbar = () => {
           </nav>
 
           <div className="ml-auto flex items-center gap-3">
-            <button
-              type="button"
-              className="btn-outline hidden sm:inline-flex"
-              disabled
-              title="Account coming soon"
-            >
-              Account
-            </button>
             <Link to="/cart" className="btn-primary">
               Cart
               {totalItems ? (

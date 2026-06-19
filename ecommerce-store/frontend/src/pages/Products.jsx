@@ -46,16 +46,29 @@ const Products = () => {
 
   const filterOptions = useMemo(() => {
     const categories = Array.from(
-      new Set(products.map((product) => product.category))
+      new Set(
+        products
+          .filter((product) => filters.brand === 'all' || product.brand === filters.brand)
+          .map((product) => product.category)
+      )
     ).sort();
-    const brands = Array.from(new Set(products.map((product) => product.brand))).sort();
+
+    const brands = Array.from(
+      new Set(
+        products
+          .filter(
+            (product) => filters.category === 'all' || product.category === filters.category
+          )
+          .map((product) => product.brand)
+      )
+    ).sort();
 
     return {
       categories,
       brands,
       priceRanges
     };
-  }, [products]);
+  }, [products, filters.category, filters.brand]);
 
   const filteredProducts = useMemo(() => {
     const range = priceRanges.find((item) => item.id === filters.priceRange);
@@ -76,10 +89,29 @@ const Products = () => {
   }, [products, filters]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value
-    }));
+    setFilters((prev) => {
+      const next = { ...prev, [key]: value };
+
+      if (key === 'category' && prev.brand !== 'all') {
+        const brandStillValid = products.some(
+          (product) =>
+            product.brand === prev.brand &&
+            (value === 'all' || product.category === value)
+        );
+        if (!brandStillValid) next.brand = 'all';
+      }
+
+      if (key === 'brand' && prev.category !== 'all') {
+        const categoryStillValid = products.some(
+          (product) =>
+            product.category === prev.category &&
+            (value === 'all' || product.brand === value)
+        );
+        if (!categoryStillValid) next.category = 'all';
+      }
+
+      return next;
+    });
   };
 
   const handleReset = () => {

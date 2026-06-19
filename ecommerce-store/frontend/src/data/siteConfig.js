@@ -14,39 +14,6 @@ export const siteConfig = {
     subtitle:
       'Explore a curated catalog of laptops, components, and peripherals with clear specs and transparent pricing.',
     primaryCta: { label: 'Browse catalog', path: '/products' },
-    secondaryCta: { label: 'See featured gear', path: '/products?featured=true' },
-    stats: [
-      { label: 'SKUs ready', value: '120+' },
-      { label: 'Top brands', value: '25' },
-      { label: 'Ship-ready categories', value: '12' }
-    ]
-  },
-  highlights: [
-    {
-      title: 'Curated inventory',
-      description: 'Every item is vetted for performance, thermals, and longevity.'
-    },
-    {
-      title: 'Spec-forward listings',
-      description: 'Key specs are surfaced upfront so you can compare quickly.'
-    },
-    {
-      title: 'Built for expansion',
-      description: 'Catalog-first architecture ready for carts, auth, and checkout.'
-    }
-  ],
-  footerColumns: [
-    {
-      title: 'Catalog',
-      links: ['Laptops', 'Components', 'Monitors', 'Storage', 'Networking']
-    },
-    {
-      title: 'Company',
-      links: ['About', 'Careers', 'Press', 'Contact']
-    },
-    {
-      title: 'Support',
-      links: ['Build guides', 'Warranty', 'Shipping', 'FAQs']
-    }
-  ]
+    secondaryCta: { label: 'See featured gear', path: '/products?featured=true' }
+  }
 };

@@ -66,3 +66,16 @@ a {
     @apply inline-flex items-center rounded-full border border-line px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted;
   }
 }
+
+@keyframes wheel-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-wheel-spin {
+  animation: wheel-spin 60s linear infinite;
+}
