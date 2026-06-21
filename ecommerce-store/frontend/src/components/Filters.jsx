@@ -1,15 +1,16 @@
-import { useState } from 'react';
-import CategoryWheel from './CategoryWheel';
-import Modal from './Modal';
+import { LayoutGrid } from 'lucide-react';
+import { getCategoryIcon } from '../data/categoryIcons';
+import PriceRangeSlider from './PriceRangeSlider';
+
+const pillClass = (active) =>
+  `flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+    active
+      ? 'border-accent bg-accent text-canvas'
+      : 'border-line bg-panelStrong text-muted hover:border-accent/60 hover:text-ink'
+  }`;
 
 const Filters = ({ options, value, onChange, onReset, resultCount }) => {
-  const [wheelOpen, setWheelOpen] = useState(false);
   const isAll = value.category === 'all';
-
-  const handleCategorySelect = (key, category) => {
-    onChange(key, category);
-    setWheelOpen(false);
-  };
 
   return (
     <aside className="panel space-y-6 p-6">
@@ -32,17 +33,58 @@ const Filters = ({ options, value, onChange, onReset, resultCount }) => {
           <label className="text-xs font-semibold uppercase tracking-wide text-muted">
             Category
           </label>
-          <button
-            type="button"
-            onClick={() => setWheelOpen(true)}
-            className="flex w-full items-center justify-between rounded-xl border border-line bg-panelStrong px-3 py-2 text-sm text-ink transition hover:border-accent/60"
-          >
-            <span>{isAll ? 'All categories' : value.category}</span>
-            <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-              Browse
-            </span>
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onChange('category', 'all')}
+              className={pillClass(isAll)}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              All
+            </button>
+            {options.categories.map((category) => {
+              const Icon = getCategoryIcon(category);
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => onChange('category', category)}
+                  className={pillClass(value.category === category)}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {category}
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {!isAll && options.subcategories.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Subcategory
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => onChange('subcategory', 'all')}
+                className={pillClass(value.subcategory === 'all')}
+              >
+                All
+              </button>
+              {options.subcategories.map((subcategory) => (
+                <button
+                  key={subcategory}
+                  type="button"
+                  onClick={() => onChange('subcategory', subcategory)}
+                  className={pillClass(value.subcategory === subcategory)}
+                >
+                  {subcategory}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-wide text-muted">
@@ -66,30 +108,13 @@ const Filters = ({ options, value, onChange, onReset, resultCount }) => {
           <label className="text-xs font-semibold uppercase tracking-wide text-muted">
             Price
           </label>
-          <select
-            className="w-full rounded-xl border border-line bg-panelStrong px-3 py-2 text-sm text-ink"
+          <PriceRangeSlider
+            bounds={options.priceBounds}
             value={value.priceRange}
-            onChange={(event) => onChange('priceRange', event.target.value)}
-          >
-            {options.priceRanges.map((range) => (
-              <option key={range.id} value={range.id}>
-                {range.label}
-              </option>
-            ))}
-          </select>
+            onChange={(range) => onChange('priceRange', range)}
+          />
         </div>
       </div>
-
-      {wheelOpen && (
-        <Modal title="Choose a category" onClose={() => setWheelOpen(false)}>
-          <CategoryWheel
-            categories={options.categories}
-            value={value.category}
-            onChange={handleCategorySelect}
-            size={320}
-          />
-        </Modal>
-      )}
     </aside>
   );
 };

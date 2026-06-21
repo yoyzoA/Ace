@@ -39,7 +39,6 @@ const Home = () => {
   return (
     <div className="space-y-16">
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-20" />
         <div className="container relative flex flex-col items-start gap-10 py-16 lg:py-24">
           <div className="space-y-6">
             <h1 className="text-4xl font-semibold text-ink md:text-5xl">

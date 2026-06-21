@@ -8,6 +8,10 @@ const buildFilters = (query) => {
     filters.category = query.category;
   }
 
+  if (typeof query.subcategory === 'string' && query.subcategory) {
+    filters.subcategory = query.subcategory;
+  }
+
   if (typeof query.brand === 'string' && query.brand) {
     filters.brand = query.brand;
   }

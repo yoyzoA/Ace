@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oxanium:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-canvas: #0e1116;
-  --color-panel: rgba(18, 23, 32, 0.94);
-  --color-panel-strong: #151b24;
-  --color-line: #252c38;
-  --color-ink: #f3f6f9;
-  --color-muted: #a6adb8;
-  --color-accent: #28a7e1;
-  --color-accent-warm: #b7bdc7;
+  --color-canvas: #0f172a;
+  --color-panel: rgba(26, 36, 54, 0.92);
+  --color-panel-strong: #1a2436;
+  --color-line: #2a3548;
+  --color-ink: #e8ecf1;
+  --color-muted: #93a0b3;
+  --color-accent: #4f8ef7;
+  --color-accent-warm: #f0b357;
 }
 
 * {
@@ -25,10 +25,7 @@ body {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   color: var(--color-ink);
   background-color: var(--color-canvas);
-  background-image:
-    radial-gradient(circle at top, rgba(40, 167, 225, 0.22), transparent 45%),
-    radial-gradient(circle at 20% 20%, rgba(183, 189, 199, 0.14), transparent 45%),
-    linear-gradient(to bottom, rgba(14, 17, 22, 0.96), #0e1116 50%, #0a0c10 100%);
+  background-image: linear-gradient(180deg, #111d33 0%, #0f172a 55%, #0c1322 100%);
   background-attachment: fixed;
 }
 
@@ -67,15 +64,42 @@ a {
   }
 }
 
-@keyframes wheel-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.range-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 1rem;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: none;
+  margin: 0;
 }
 
-.animate-wheel-spin {
-  animation: wheel-spin 60s linear infinite;
+.range-thumb::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  border: 2px solid var(--color-canvas);
+  cursor: pointer;
 }
+
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  border: 2px solid var(--color-canvas);
+  cursor: pointer;
+}
+
+.range-thumb::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+

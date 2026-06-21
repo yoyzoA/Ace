@@ -23,14 +23,11 @@ export default {
       },
       fontFamily: {
         sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
-        display: ['Oxanium', 'system-ui', 'sans-serif']
+        display: ['Space Grotesk', 'system-ui', 'sans-serif']
       },
       boxShadow: {
-        glow: '0 0 30px rgba(40, 167, 225, 0.25)',
-        panel: '0 12px 40px rgba(5, 10, 20, 0.45)'
-      },
-      backgroundImage: {
-        grid: 'linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)'
+        glow: '0 8px 20px rgba(79, 142, 247, 0.25)',
+        panel: '0 12px 30px rgba(2, 6, 16, 0.35)'
       }
     }
   },

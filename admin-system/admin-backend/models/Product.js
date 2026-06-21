@@ -13,6 +13,11 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
+    subcategory: {
+      type: String,
+      trim: true,
+      default: ''
+    },
     brand: {
       type: String,
       trim: true

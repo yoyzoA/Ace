@@ -88,6 +88,7 @@ router.post('/', async (req, res) => {
   try {
     const name = normalizeString(req.body.name);
     const category = normalizeString(req.body.category);
+    const subcategory = normalizeString(req.body.subcategory);
     const brand = normalizeString(req.body.brand);
     const description = normalizeString(req.body.description);
     const price = normalizeNumber(req.body.price);
@@ -108,6 +109,7 @@ router.post('/', async (req, res) => {
       name,
       price,
       category,
+      subcategory,
       brand,
       description,
       specs,
@@ -136,6 +138,10 @@ router.put('/:id', async (req, res) => {
 
     if (hasOwn(req.body, 'category')) {
       product.category = normalizeString(req.body.category);
+    }
+
+    if (hasOwn(req.body, 'subcategory')) {
+      product.subcategory = normalizeString(req.body.subcategory);
     }
 
     if (hasOwn(req.body, 'brand')) {
