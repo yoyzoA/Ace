@@ -1,0 +1,46 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "FrontendBucketList",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::acecomputerslb.com"
+    },
+    {
+      "Sid": "FrontendBucketObjects",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::acecomputerslb.com/*"
+    },
+    {
+      "Sid": "EBArtifactUpload",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject"],
+      "Resource": "arn:aws:s3:::elasticbeanstalk-eu-central-1-637423434077/*"
+    },
+    {
+      "Sid": "CloudFrontInvalidation",
+      "Effect": "Allow",
+      "Action": ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"],
+      "Resource": "arn:aws:cloudfront::637423434077:distribution/E3A66148P05R1M"
+    },
+    {
+      "Sid": "ElasticBeanstalkDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "elasticbeanstalk:CreateApplicationVersion",
+        "elasticbeanstalk:UpdateEnvironment",
+        "elasticbeanstalk:DescribeEnvironments",
+        "elasticbeanstalk:DescribeApplicationVersions",
+        "elasticbeanstalk:DescribeEvents",
+        "elasticbeanstalk:DescribeConfigurationSettings"
+      ],
+      "Resource": [
+        "arn:aws:elasticbeanstalk:eu-central-1:637423434077:application/Ace-Website",
+        "arn:aws:elasticbeanstalk:eu-central-1:637423434077:environment/Ace-Website/Ace-Website-env",
+        "arn:aws:elasticbeanstalk:eu-central-1:637423434077:applicationversion/Ace-Website/*"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ecommerce-store/**'
+      - '.github/workflows/deploy.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-central-1
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ecommerce-store/frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ecommerce-store/frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: ecommerce-store/frontend
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_USE_MOCK_DATA: ${{ vars.VITE_USE_MOCK_DATA }}
+        run: npm run build
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync to S3
+        run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete
+
+      - name: Invalidate CloudFront
+        run: aws cloudfront create-invalidation --distribution-id E3A66148P05R1M --paths "/*"
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zip backend
+        working-directory: ecommerce-store/backend
+        run: zip -r ../backend-deploy.zip . -x ".env" ".env.*" "node_modules/*"
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload bundle to S3
+        run: aws s3 cp ecommerce-store/backend-deploy.zip s3://elasticbeanstalk-eu-central-1-637423434077/Ace-Website/backend-${{ github.sha }}.zip
+
+      - name: Create application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name Ace-Website \
+            --version-label ${{ github.sha }} \
+            --source-bundle S3Bucket=elasticbeanstalk-eu-central-1-637423434077,S3Key=Ace-Website/backend-${{ github.sha }}.zip
+
+      - name: Deploy new version
+        run: |
+          aws elasticbeanstalk update-environment \
+            --environment-name Ace-Website-env \
+            --version-label ${{ github.sha }}
+
+      - name: Wait for environment to be ready
+        run: aws elasticbeanstalk wait environment-updated --environment-names Ace-Website-env
