@@ -18,6 +18,17 @@ const NotFound = () => {
         <Link to="/" className="btn-primary w-fit">
           Go home
         </Link>
+        <div className="flex flex-wrap justify-center gap-4 pt-2 text-xs text-muted">
+          <Link to="/products" className="hover:text-accent">
+            Browse products
+          </Link>
+          <Link to="/faq" className="hover:text-accent">
+            FAQ
+          </Link>
+          <Link to="/contact" className="hover:text-accent">
+            Contact us
+          </Link>
+        </div>
       </div>
     </div>
   );

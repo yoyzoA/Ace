@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProductGrid from '../components/ProductGrid';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { useCart } from '../context/CartContext';
 import { getProductById, getProducts } from '../services/api';
 import { formatPrice } from '../utils/formatters';
@@ -76,6 +77,12 @@ const ProductDetails = () => {
 
   return (
     <div className="container space-y-10 py-12">
+      <Breadcrumbs
+        items={[
+          { label: 'Products', path: '/products' },
+          { label: product ? product.name : 'Product', path: `/products/${id}` }
+        ]}
+      />
       <Link to="/products" className="text-sm text-muted">
         Back to catalog
       </Link>

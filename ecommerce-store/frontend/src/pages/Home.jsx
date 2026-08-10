@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductGrid from '../components/ProductGrid';
+import Testimonials from '../components/Testimonials';
 import { getProducts } from '../services/api';
 import { siteConfig } from '../data/siteConfig';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -73,6 +74,25 @@ const Home = () => {
             subtitle="Hand-picked highlights from our newest arrivals."
           />
         )}
+      </section>
+
+      <Testimonials />
+
+      <section className="container">
+        <div className="panel grid gap-6 p-8 sm:grid-cols-3">
+          <Link to="/about" className="space-y-1">
+            <h3 className="text-base font-semibold text-ink">About & team</h3>
+            <p className="text-sm text-muted">25+ years serving Batroun. Meet the people behind the store.</p>
+          </Link>
+          <Link to="/faq" className="space-y-1">
+            <h3 className="text-base font-semibold text-ink">FAQ</h3>
+            <p className="text-sm text-muted">Payment, delivery, pickup, and warranty answers.</p>
+          </Link>
+          <Link to="/contact" className="space-y-1">
+            <h3 className="text-base font-semibold text-ink">Visit the store</h3>
+            <p className="text-sm text-muted">Get directions and store hours in Batroun.</p>
+          </Link>
+        </div>
       </section>
     </div>
   );

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import Filters from '../components/Filters';
 import ProductGrid from '../components/ProductGrid';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { getProducts } from '../services/api';
 import { formatPrice } from '../utils/formatters';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -212,6 +213,7 @@ const Products = () => {
 
   return (
     <div className="container space-y-10 py-12">
+      <Breadcrumbs items={[{ label: 'Products', path: '/products' }]} />
       <div className="space-y-3">
         <p className="chip">Catalog</p>
         <h1 className="text-3xl font-semibold text-ink">Products</h1>

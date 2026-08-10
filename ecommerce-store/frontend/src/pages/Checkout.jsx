@@ -5,6 +5,7 @@ import { getProducts, placeOrder } from '../services/api';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { formatPrice } from '../utils/formatters';
 import { getAvailableStock } from '../utils/inventory';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const Checkout = () => {
   usePageMeta({
@@ -133,7 +134,13 @@ const Checkout = () => {
 
   if (!items.length) {
     return (
-      <div className="container py-12">
+      <div className="container space-y-6 py-12">
+        <Breadcrumbs
+          items={[
+            { label: 'Cart', path: '/cart' },
+            { label: 'Checkout', path: '/checkout' }
+          ]}
+        />
         <div className="panel p-8 text-center">
           <h1 className="text-2xl font-semibold text-ink">Your cart is empty</h1>
           <p className="mt-3 text-sm text-muted">
@@ -149,6 +156,12 @@ const Checkout = () => {
 
   return (
     <div className="container space-y-8 py-12">
+      <Breadcrumbs
+        items={[
+          { label: 'Cart', path: '/cart' },
+          { label: 'Checkout', path: '/checkout' }
+        ]}
+      />
       <div>
         <p className="chip">Checkout</p>
         <h1 className="mt-2 text-3xl font-semibold text-ink">Confirm your order</h1>

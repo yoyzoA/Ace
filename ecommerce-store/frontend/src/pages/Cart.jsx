@@ -5,6 +5,7 @@ import { getProducts } from '../services/api';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { formatPrice } from '../utils/formatters';
 import { getAvailableStock } from '../utils/inventory';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const Cart = () => {
   usePageMeta({
@@ -92,7 +93,8 @@ const Cart = () => {
 
   if (!items.length) {
     return (
-      <div className="container py-12">
+      <div className="container space-y-6 py-12">
+        <Breadcrumbs items={[{ label: 'Cart', path: '/cart' }]} />
         <div className="panel p-8 text-center">
           <h1 className="text-2xl font-semibold text-ink">Your cart is empty</h1>
           <p className="mt-3 text-sm text-muted">
@@ -108,6 +110,7 @@ const Cart = () => {
 
   return (
     <div className="container space-y-8 py-12">
+      <Breadcrumbs items={[{ label: 'Cart', path: '/cart' }]} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="chip">Cart</p>

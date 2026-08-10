@@ -29,6 +29,14 @@ const OrderSuccess = () => {
             View cart
           </Link>
         </div>
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs text-muted">
+          <Link to="/faq" className="hover:text-accent">
+            Delivery & order FAQ
+          </Link>
+          <Link to="/contact" className="hover:text-accent">
+            Contact us
+          </Link>
+        </div>
       </div>
     </div>
   );
