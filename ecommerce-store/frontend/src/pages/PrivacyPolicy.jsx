@@ -15,9 +15,7 @@ const PrivacyPolicy = () => {
       <div className="space-y-3">
         <p className="chip">Legal</p>
         <h1 className="text-3xl font-semibold text-ink">Privacy policy</h1>
-        <p className="text-sm text-muted">
-          Last updated: this is a draft template &mdash; have it reviewed before publishing.
-        </p>
+        <p className="text-sm text-muted">Last updated: August 10, 2026.</p>
       </div>
 
       <div className="panel space-y-6 p-6 text-sm text-muted">

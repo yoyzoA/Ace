@@ -14,7 +14,6 @@ const STATIC_ROUTES = [
   { loc: '/', priority: '1.0' },
   { loc: '/products', priority: '0.9' },
   { loc: '/about', priority: '0.6' },
-  { loc: '/case-studies', priority: '0.5' },
   { loc: '/faq', priority: '0.5' },
   { loc: '/contact', priority: '0.7' },
   { loc: '/privacy-policy', priority: '0.3' }

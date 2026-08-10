@@ -19,7 +19,6 @@ const Contact = () => {
       <div className="space-y-3">
         <p className="chip">Contact</p>
         <h1 className="text-3xl font-semibold text-ink">Visit or reach out</h1>
-        <p className="max-w-2xl text-sm text-muted">{siteConfig.responseTimePromise}</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">

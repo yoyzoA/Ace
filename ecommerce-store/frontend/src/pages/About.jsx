@@ -25,10 +25,7 @@ const About = () => {
 
       <div className="panel p-6">
         <h2 className="text-lg font-semibold text-ink">Meet the team</h2>
-        <p className="mt-2 text-sm text-muted">
-          Photo coming soon &mdash; add a real team photo to replace these placeholders.
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:max-w-sm">
           {siteConfig.team.map((member) => (
             <div
               key={member.name}

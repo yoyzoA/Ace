@@ -10,7 +10,6 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import About from './pages/About';
-import CaseStudies from './pages/CaseStudies';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -40,7 +39,6 @@ const App = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success/:id" element={<OrderSuccess />} />
           <Route path="/about" element={<About />} />
-          <Route path="/case-studies" element={<CaseStudies />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
