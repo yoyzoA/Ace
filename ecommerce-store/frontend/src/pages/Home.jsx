@@ -5,6 +5,7 @@ import Testimonials from '../components/Testimonials';
 import { getProducts } from '../services/api';
 import { siteConfig } from '../data/siteConfig';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { usePageStatus } from '../hooks/usePageStatus';
 
 const Home = () => {
   usePageMeta({
@@ -15,6 +16,8 @@ const Home = () => {
 
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('idle');
+
+  usePageStatus(status);
 
   useEffect(() => {
     const loadProducts = async () => {

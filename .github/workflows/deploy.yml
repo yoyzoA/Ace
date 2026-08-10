@@ -46,6 +46,24 @@ jobs:
         run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete
 
       - name: Invalidate CloudFront
+        id: invalidate
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id E3A66148P05R1M --paths "/*" --query 'Invalidation.Id' --output text)
+          echo "id=$INVALIDATION_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for CloudFront invalidation to finish
+        run: aws cloudfront wait invalidation-completed --distribution-id E3A66148P05R1M --id ${{ steps.invalidate.outputs.id }}
+
+      - name: Prerender static HTML snapshots from the live site
+        working-directory: ecommerce-store/frontend
+        env:
+          PRERENDER_BASE_URL: https://acecomputerslb.com
+        run: npm run prerender
+
+      - name: Sync prerendered snapshots to S3
+        run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete
+
+      - name: Invalidate CloudFront again
         run: aws cloudfront create-invalidation --distribution-id E3A66148P05R1M --paths "/*"
 
   deploy-backend:

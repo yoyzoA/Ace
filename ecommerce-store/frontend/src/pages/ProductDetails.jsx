@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { getProductById, getProducts } from '../services/api';
 import { formatPrice } from '../utils/formatters';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { usePageStatus } from '../hooks/usePageStatus';
 import { siteConfig } from '../data/siteConfig';
 import { getAvailableStock } from '../utils/inventory';
 
@@ -15,6 +16,8 @@ const ProductDetails = () => {
   const [related, setRelated] = useState([]);
   const [status, setStatus] = useState('idle');
   const { addItem } = useCart();
+
+  usePageStatus(status);
 
   usePageMeta({
     title: product ? product.name : 'Product Details',
@@ -200,7 +203,7 @@ const ProductDetails = () => {
             <div className="panel space-y-4 p-6">
               <h2 className="text-lg font-semibold text-ink">Contact</h2>
               <div className="rounded-xl border border-line bg-panelStrong p-4 text-sm text-muted">
-                Need bulk pricing? Reach out to sales at {siteConfig.phone}.
+                {`Need bulk pricing? Reach out to sales at ${siteConfig.phone}.`}
               </div>
               <a
                 className="btn-outline w-fit"

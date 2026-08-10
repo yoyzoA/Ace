@@ -57,15 +57,18 @@ export const usePageMeta = ({ title, description, image, schema }) => {
   }, [title, description, image, location.pathname]);
 
   useEffect(() => {
-    if (!schema) return undefined;
+    let script = document.querySelector('script[data-page-schema="true"]');
 
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(schema);
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
+    if (schema) {
+      if (!script) {
+        script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.setAttribute('data-page-schema', 'true');
+        document.head.appendChild(script);
+      }
+      script.text = JSON.stringify(schema);
+    } else if (script) {
+      script.remove();
+    }
   }, [schema]);
 };

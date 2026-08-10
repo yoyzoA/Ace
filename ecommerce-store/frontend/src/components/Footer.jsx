@@ -86,7 +86,7 @@ const Footer = () => (
     </div>
     <div className="border-t border-line">
       <div className="container flex flex-col items-center justify-between gap-3 py-5 text-xs text-muted md:flex-row">
-        <span>(c) {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</span>
+        <span>{`(c) ${new Date().getFullYear()} ${siteConfig.name}. All rights reserved.`}</span>
         <Link to="/privacy-policy" className="hover:text-accent">
           Privacy policy
         </Link>

@@ -41,11 +41,21 @@ const writeCart = (items) => {
 const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
-  const [items, setItems] = useState(() => readCart());
+  // Start empty so this matches prerendered/static markup on first paint,
+  // then load the real persisted cart right after mount.
+  const [items, setItems] = useState([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    writeCart(items);
-  }, [items]);
+    setItems(readCart());
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (hydrated) {
+      writeCart(items);
+    }
+  }, [items, hydrated]);
 
   useEffect(() => {
     const handleStorage = (event) => {

@@ -19,9 +19,7 @@ const Testimonials = () => {
                 />
               ))}
             </span>
-            <span>
-              {ratingValue} out of 5 &middot; {reviewCount} {source}
-            </span>
+            <span>{`${ratingValue} out of 5 · ${reviewCount} ${source}`}</span>
           </div>
         </div>
         <a href={siteConfig.reviewsUrl} target="_blank" rel="noreferrer" className="btn-outline">
@@ -32,8 +30,8 @@ const Testimonials = () => {
       <div className="grid gap-6 sm:grid-cols-2">
         {highlights.map((review) => (
           <blockquote key={review.author} className="panel space-y-3 p-6">
-            <p className="text-sm text-ink">&ldquo;{review.quote}&rdquo;</p>
-            <footer className="text-xs text-muted">&mdash; {review.author}, {source}</footer>
+            <p className="text-sm text-ink">{`“${review.quote}”`}</p>
+            <footer className="text-xs text-muted">{`— ${review.author}, ${source}`}</footer>
           </blockquote>
         ))}
       </div>

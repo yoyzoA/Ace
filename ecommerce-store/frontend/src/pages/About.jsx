@@ -19,10 +19,7 @@ const About = () => {
           25+ years serving Batroun&apos;s tech needs
         </h1>
         <p className="max-w-2xl text-sm text-muted">
-          {siteConfig.name} is a computer and multimedia store in Batroun, Lebanon, with more
-          than 25 years of experience and an internet service provider since 1998. We help
-          customers pick the right hardware, build custom PCs, and get reliable support after
-          the sale.
+          {`${siteConfig.name} is a computer and multimedia store in Batroun, Lebanon, with more than 25 years of experience and an internet service provider since 1998. We help customers pick the right hardware, build custom PCs, and get reliable support after the sale.`}
         </p>
       </div>
 

@@ -81,3 +81,59 @@ Replace placeholders in `deployment/cloudfront-distribution.json`:
 ## SPA routing (React)
 
 Ensure CloudFront returns `index.html` for 403/404 by using the `CustomErrorResponses` settings in the distribution config.
+
+## Prerendering and the clean-URL CloudFront Function (one-time setup)
+
+The frontend build now also produces static HTML snapshots for crawler/AI visibility
+(see `frontend/scripts/prerender.mjs` and `frontend/scripts/generate-sitemap.mjs`).
+The deploy workflow (`.github/workflows/deploy.yml`) already: builds, syncs to S3,
+invalidates, prerenders against the live site, syncs the snapshots, and invalidates
+again. No further CI changes are needed.
+
+However, S3 only serves an object at the exact key requested. A snapshot written to
+`about/index.html` is only reachable at the URL `/about/` (trailing slash) unless
+CloudFront rewrites the request first - and every internal link, the sitemap, and
+canonical tags on this site use `/about` (no trailing slash). Without the rewrite,
+those requests 404 and CloudFront's `CustomErrorResponses` silently fall back to the
+plain SPA shell at the root `index.html`, so the prerendered content is never served.
+
+This is a one-time setup step (not part of CI) to fix that, using the function in
+`deployment/cloudfront-functions/spa-clean-urls.js`:
+
+```
+aws cloudfront create-function \
+  --name spa-clean-urls \
+  --function-config Comment="Rewrite extensionless URIs to /index.html for prerendered SPA routes",Runtime=cloudfront-js-1.0 \
+  --function-code fileb://deployment/cloudfront-functions/spa-clean-urls.js
+```
+
+Note the `ETag` returned, then publish it:
+
+```
+aws cloudfront publish-function --name spa-clean-urls --if-match <ETag from create output>
+```
+
+Then associate it with the distribution's default cache behavior as a
+`viewer-request` function. Get the current config, edit
+`DefaultCacheBehavior.FunctionAssociations` to add it, and update:
+
+```
+aws cloudfront get-distribution-config --id E3A66148P05R1M > current-config.json
+# edit current-config.json: add to DefaultCacheBehavior
+#   "FunctionAssociations": {
+#     "Quantity": 1,
+#     "Items": [
+#       { "EventType": "viewer-request", "FunctionARN": "<published function ARN>" }
+#     ]
+#   }
+# remove the top-level "ETag" field before using it as --distribution-config
+
+aws cloudfront update-distribution \
+  --id E3A66148P05R1M \
+  --distribution-config file://current-config.json \
+  --if-match <ETag from get-distribution-config>
+```
+
+Until this is done, prerendered snapshots sit unused in S3 and every route except
+the homepage keeps serving the plain client-rendered shell to non-JS crawlers -
+functionally identical to before prerendering was added.

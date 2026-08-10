@@ -5,7 +5,7 @@ import App from './App';
 import { CartProvider } from './context/CartContext';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const app = (
   <React.StrictMode>
     <BrowserRouter>
       <CartProvider>
@@ -14,3 +14,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+const rootElement = document.getElementById('root');
+
+// react-snap prerenders static HTML into #root; hydrate it instead of
+// re-rendering from scratch so there's no flash of empty content.
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(rootElement, app);
+} else {
+  ReactDOM.createRoot(rootElement).render(app);
+}

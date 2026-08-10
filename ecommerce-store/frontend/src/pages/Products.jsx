@@ -7,6 +7,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import { getProducts } from '../services/api';
 import { formatPrice } from '../utils/formatters';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { usePageStatus } from '../hooks/usePageStatus';
 
 const defaultFilters = {
   search: '',
@@ -31,6 +32,8 @@ const Products = () => {
   }));
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('idle');
+
+  usePageStatus(status);
 
   useEffect(() => {
     const loadProducts = async () => {

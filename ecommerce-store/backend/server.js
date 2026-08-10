@@ -15,21 +15,26 @@ const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
   : [];
 
-app.use(
-  cors(
-    allowedOrigins.length
-      ? { origin: allowedOrigins, methods: ['GET', 'POST', 'OPTIONS'], optionsSuccessStatus: 200 }
-      : undefined
-  )
+// Order placement is a mutating endpoint, so it stays restricted to our own frontend.
+const restrictedCors = cors(
+  allowedOrigins.length
+    ? { origin: allowedOrigins, methods: ['POST', 'OPTIONS'], optionsSuccessStatus: 200 }
+    : undefined
 );
+
+// The product catalog is public, read-only storefront data (same as what any visitor
+// sees in a browser), so it's safe to allow any origin to read it. This also lets the
+// frontend's build-time prerenderer and other tools fetch the catalog directly.
+const publicReadCors = cors({ methods: ['GET', 'OPTIONS'], optionsSuccessStatus: 200 });
+
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api/products', publicReadCors, productRoutes);
+app.use('/api/orders', restrictedCors, orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;

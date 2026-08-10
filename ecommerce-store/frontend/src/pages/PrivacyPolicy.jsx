@@ -56,11 +56,11 @@ const PrivacyPolicy = () => {
         <section className="space-y-2">
           <h2 className="text-base font-semibold text-ink">Contact us</h2>
           <p>
-            Questions about this policy or your data can be sent to{' '}
+            {'Questions about this policy or your data can be sent to '}
             <a href={`mailto:${siteConfig.email}`} className="text-accent">
               {siteConfig.email}
-            </a>{' '}
-            or {siteConfig.phone}.
+            </a>
+            {` or ${siteConfig.phone}.`}
           </p>
         </section>
       </div>
