@@ -20,10 +20,10 @@ const PriceRangeSlider = ({ bounds, value, onChange }) => {
 
   return (
     <div className="space-y-3">
-      <div className="relative h-4">
-        <div className="absolute left-0 right-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-line" />
+      <div className="relative h-5">
+        <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-line" />
         <div
-          className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-accent"
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-accent"
           style={{ left: `${minPct}%`, right: `${100 - maxPct}%` }}
         />
         <input
@@ -47,9 +47,12 @@ const PriceRangeSlider = ({ bounds, value, onChange }) => {
           aria-label="Maximum price"
         />
       </div>
-      <div className="flex items-center justify-between text-xs text-muted">
-        <span>{formatPrice(current.min)}</span>
-        <span>
+      <div className="flex items-center justify-between gap-2 text-xs">
+        <span className="rounded-lg border border-line px-2.5 py-1.5 font-medium text-ink">
+          {formatPrice(current.min)}
+        </span>
+        <span className="h-px flex-1 bg-line" aria-hidden="true" />
+        <span className="rounded-lg border border-line px-2.5 py-1.5 font-medium text-ink">
           {formatPrice(current.max)}
           {current.max >= bounds.max ? '+' : ''}
         </span>

@@ -17,15 +17,15 @@ const Breadcrumbs = ({ items }) => {
   };
 
   return (
-    <nav aria-label="Breadcrumb" className="text-xs text-muted">
+    <nav aria-label="Breadcrumb" className="text-sm text-muted">
       <ol className="flex flex-wrap items-center gap-1.5">
         {trail.map((item, index) => {
           const isLast = index === trail.length - 1;
           return (
-            <li key={item.path} className="flex items-center gap-1.5">
-              {index > 0 && <ChevronRight className="h-3 w-3" aria-hidden="true" />}
+            <li key={`${item.path}-${index}`} className="flex min-w-0 items-center gap-1.5">
+              {index > 0 && <ChevronRight className="h-3.5 w-3.5 shrink-0 text-silver" aria-hidden="true" />}
               {isLast ? (
-                <span className="font-semibold text-ink" aria-current="page">
+                <span className="truncate font-medium text-ink" aria-current="page">
                   {item.label}
                 </span>
               ) : (

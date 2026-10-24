@@ -6,6 +6,8 @@ export const siteConfig = {
   whatsapp: '96176747949',
   email: 'tonyassal@hotmail.com',
   logo: '/ace-logo.png',
+  // Same logo with the surrounding whitespace trimmed, for the header and footer.
+  logoMark: '/ace-logo-mark.png',
   siteUrl: import.meta.env.VITE_SITE_URL || 'https://acecomputerslb.com',
   hoursNote: 'Open daily, closes 7 PM. Confirm exact hours before visiting for a specific day.',
   mapsQuery: 'Ace Computers sarl, Hadadi Street, Batroun, Lebanon',
@@ -50,10 +52,24 @@ export const siteConfig = {
     { label: 'Privacy policy', path: '/privacy-policy' }
   ],
   hero: {
-    title: 'Build faster. Play harder.',
+    title: 'Computers, parts and gear, picked by people who know them.',
     subtitle:
-      'Explore a curated catalog of laptops, components, and peripherals with clear specs and transparent pricing.',
+      'Laptops, components, monitors, networking and accessories from a Batroun store with more than 25 years of experience.',
     primaryCta: { label: 'Browse catalog', path: '/products' },
     secondaryCta: { label: 'See featured gear', path: '/products?featured=true' }
-  }
+  },
+  services: [
+    {
+      title: 'Cash on delivery',
+      text: 'Order online and pay when it reaches you. No card needed.'
+    },
+    {
+      title: 'Pickup or delivery',
+      text: 'Collect from the store in Batroun, or have it delivered for a small fee.'
+    },
+    {
+      title: 'Advice before you buy',
+      text: 'Not sure which part fits your build? Call or WhatsApp us and ask.'
+    }
+  ]
 };
