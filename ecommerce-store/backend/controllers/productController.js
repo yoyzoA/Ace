@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
 
+// Products are visible unless explicitly hidden (older documents have no field).
+const VISIBLE = { published: { $ne: false } };
+
 const buildFilters = (query) => {
-  const filters = {};
+  const filters = { ...VISIBLE };
 
   if (typeof query.category === 'string' && query.category) {
     filters.category = query.category;
@@ -53,7 +56,7 @@ const getProductById = async (req, res) => {
   }
 
   try {
-    const product = await Product.findById(id);
+    const product = await Product.findOne({ _id: id, ...VISIBLE });
 
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });

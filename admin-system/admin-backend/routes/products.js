@@ -93,6 +93,7 @@ router.post('/', async (req, res) => {
     const description = normalizeString(req.body.description);
     const price = normalizeNumber(req.body.price);
     const featured = normalizeBoolean(req.body.featured, false);
+    const published = normalizeBoolean(req.body.published, true);
     const images = normalizeImages(req.body.images);
     const specs = normalizeSpecs(req.body.specs);
     const stock = normalizeStock(req.body.stock);
@@ -115,6 +116,7 @@ router.post('/', async (req, res) => {
       specs,
       images,
       featured,
+      published,
       stock: stock === null ? 0 : stock
     });
 
@@ -162,6 +164,10 @@ router.put('/:id', async (req, res) => {
 
     if (hasOwn(req.body, 'featured')) {
       product.featured = normalizeBoolean(req.body.featured, product.featured);
+    }
+
+    if (hasOwn(req.body, 'published')) {
+      product.published = normalizeBoolean(req.body.published, product.published !== false);
     }
 
     if (hasOwn(req.body, 'images')) {

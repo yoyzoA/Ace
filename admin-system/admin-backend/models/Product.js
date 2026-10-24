@@ -47,6 +47,11 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    // false = hidden from the public website (still visible in the admin app)
+    published: {
+      type: Boolean,
+      default: true
+    },
     stock: {
       type: Number,
       default: 0,
