@@ -1,0 +1,17 @@
+# Generated data: catalog exports contain customer orders, and photo work files are large.
+catalog_export.json
+backup_before_apply_*.json
+catalog_decisions.json
+photos/node_modules/
+photos/candidates/
+photos/candidates_old/
+photos/sheets/
+photos/review/
+photos/pick/
+photos/rejected_photos/
+photos/*.json
+photos/*.tar
+photos/*.tgz
+photos/*.txt
+photos/*.csv
+!photos/package.json

@@ -53,6 +53,7 @@ export default function Products() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [search, setSearch] = useState('');
+  const [visibility, setVisibility] = useState('all');
 
   const apiBase = API_BASE_URL;
 
@@ -60,21 +61,40 @@ export default function Products() {
     const featuredCount = products.filter((product) => product.featured).length;
     return {
       total: products.length,
-      featured: featuredCount
+      featured: featuredCount,
+      published: products.filter((product) => product.published !== false).length
     };
   }, [products]);
 
   const filteredProducts = useMemo(() => {
     const query = normalizeName(search).toLowerCase();
-    if (!query) {
-      return products;
-    }
-    return products.filter((product) =>
-      [product.name, product.brand, product.category].some((value) =>
+    return products.filter((product) => {
+      const isPublished = product.published !== false;
+      if (visibility === 'shown' && !isPublished) return false;
+      if (visibility === 'hidden' && isPublished) return false;
+      if (!query) return true;
+      return [product.name, product.brand, product.category].some((value) =>
         normalizeName(value).toLowerCase().includes(query)
-      )
+      );
+    });
+  }, [products, search, visibility]);
+
+  const handleTogglePublished = async (product) => {
+    const id = product._id || product.id;
+    const next = product.published === false;
+    setError('');
+    setProducts((prev) =>
+      prev.map((item) => ((item._id || item.id) === id ? { ...item, published: next } : item))
     );
-  }, [products, search]);
+    try {
+      await updateProduct(id, { published: next });
+    } catch (toggleError) {
+      setProducts((prev) =>
+        prev.map((item) => ((item._id || item.id) === id ? { ...item, published: !next } : item))
+      );
+      setError(getErrorMessage(toggleError));
+    }
+  };
 
   const refreshData = async () => {
     setLoading(true);
@@ -185,6 +205,16 @@ export default function Products() {
             placeholder="Search by name, brand, or category"
             className="w-72 rounded-full border border-outline bg-white/70 px-4 py-2 text-sm text-ink shadow-panel focus:border-accent focus:outline-none"
           />
+          <select
+            value={visibility}
+            onChange={(event) => setVisibility(event.target.value)}
+            className="rounded-full border border-outline bg-white/70 px-4 py-2 text-sm text-ink shadow-panel focus:border-accent focus:outline-none"
+            aria-label="Filter by website visibility"
+          >
+            <option value="all">All products</option>
+            <option value="shown">Shown on website</option>
+            <option value="hidden">Hidden from website</option>
+          </select>
           <button
             type="button"
             onClick={refreshData}
@@ -202,7 +232,7 @@ export default function Products() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-outline bg-panel p-4 shadow-panel">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">Total</p>
           <div className="mt-3 text-2xl font-semibold text-ink">{summary.total}</div>
@@ -210,6 +240,13 @@ export default function Products() {
         <div className="rounded-2xl border border-outline bg-panel p-4 shadow-panel">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">Featured</p>
           <div className="mt-3 text-2xl font-semibold text-ink">{summary.featured}</div>
+        </div>
+        <div className="rounded-2xl border border-outline bg-panel p-4 shadow-panel">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">On website</p>
+          <div className="mt-3 text-2xl font-semibold text-ink">
+            {summary.published}
+            <span className="ml-2 text-sm font-normal text-muted">{`${summary.total - summary.published} hidden`}</span>
+          </div>
         </div>
       </div>
 
@@ -228,6 +265,7 @@ export default function Products() {
           products={filteredProducts}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onTogglePublished={handleTogglePublished}
         />
       ) : (
         <div className="rounded-2xl border border-outline bg-panel px-6 py-10 text-center text-sm text-muted">

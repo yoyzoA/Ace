@@ -6,16 +6,17 @@ const formatCurrency = (value) => {
   }).format(numberValue);
 };
 
-export default function ProductTable({ products, onEdit, onDelete }) {
+export default function ProductTable({ products, onEdit, onDelete, onTogglePublished }) {
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-[minmax(220px,1.2fr)_0.7fr_0.7fr_0.4fr_0.6fr_0.5fr_0.8fr] gap-4 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+      <div className="grid grid-cols-[minmax(220px,1.2fr)_0.7fr_0.7fr_0.4fr_0.6fr_0.5fr_0.6fr_0.8fr] gap-4 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
         <div>Product</div>
         <div>Category</div>
         <div>Brand</div>
         <div>Stock</div>
         <div>Price</div>
         <div>Featured</div>
+        <div>Website</div>
         <div className="text-right">Actions</div>
       </div>
       {products.map((product, index) => {
@@ -28,7 +29,7 @@ export default function ProductTable({ products, onEdit, onDelete }) {
           <div
             key={product._id || product.id}
             style={{ animationDelay: `${index * 40}ms` }}
-            className="grid animate-fade-up grid-cols-[minmax(220px,1.2fr)_0.7fr_0.7fr_0.4fr_0.6fr_0.5fr_0.8fr] items-center gap-4 rounded-2xl border border-outline bg-panel px-4 py-3 shadow-panel"
+            className="grid animate-fade-up grid-cols-[minmax(220px,1.2fr)_0.7fr_0.7fr_0.4fr_0.6fr_0.5fr_0.6fr_0.8fr] items-center gap-4 rounded-2xl border border-outline bg-panel px-4 py-3 shadow-panel"
           >
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 overflow-hidden rounded-xl bg-[linear-gradient(135deg,rgba(10,113,94,0.2),rgba(222,132,55,0.2))]">
@@ -59,6 +60,20 @@ export default function ProductTable({ products, onEdit, onDelete }) {
                   Standard
                 </span>
               )}
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={() => onTogglePublished?.(product)}
+                title="Click to switch"
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  product.published === false
+                    ? 'border border-outline text-muted hover:border-accent'
+                    : 'bg-accent text-white hover:opacity-90'
+                }`}
+              >
+                {product.published === false ? 'Hidden' : 'Shown'}
+              </button>
             </div>
             <div className="flex justify-end gap-2">
               <button

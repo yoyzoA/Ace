@@ -19,6 +19,8 @@ const productSchema = new mongoose.Schema(
     specs: { type: [specSchema], default: [] },
     images: { type: [String], default: [] },
     featured: { type: Boolean, default: false },
+    // false = hidden from the public website (still visible in the admin app)
+    published: { type: Boolean, default: true },
     stock: { type: Number, default: 0, min: 0 },
     reserved: { type: Number, default: 0, min: 0 }
   },

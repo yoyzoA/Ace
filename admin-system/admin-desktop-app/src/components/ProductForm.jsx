@@ -10,7 +10,8 @@ const emptyForm = {
   category: '',
   brand: '',
   description: '',
-  featured: false
+  featured: false,
+  published: true
 };
 
 const normalizeSpecs = (specs) =>
@@ -49,7 +50,8 @@ export default function ProductForm({
         category: initialProduct.category || '',
         brand: initialProduct.brand || '',
         description: initialProduct.description || '',
-        featured: initialProduct.featured ?? false
+        featured: initialProduct.featured ?? false,
+        published: initialProduct.published !== false
       });
       setImages(
         Array.isArray(initialProduct.images) && initialProduct.images.length > 0
@@ -102,6 +104,7 @@ export default function ProductForm({
       brand: formValues.brand.trim(),
       description: formValues.description.trim(),
       featured: Boolean(formValues.featured),
+      published: Boolean(formValues.published),
       images: images.map((image) => image.trim()).filter(Boolean),
       specs: specs
         .map((spec) => ({
@@ -223,6 +226,20 @@ export default function ProductForm({
               className="h-4 w-4 rounded border-outline text-accent focus:ring-accent"
             />
             Featured product
+          </label>
+
+          <label className="flex items-center gap-3 rounded-2xl border border-outline px-4 py-3 text-sm font-semibold text-ink">
+            <input
+              name="published"
+              type="checkbox"
+              checked={formValues.published}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-outline text-accent focus:ring-accent"
+            />
+            Show on website
+            <span className="ml-auto text-xs font-normal text-muted">
+              Unticked products stay here but are hidden from customers.
+            </span>
           </label>
 
           <div className="space-y-3">
