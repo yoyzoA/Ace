@@ -13,6 +13,9 @@ const fs = require('fs');
 const path = require('path');
 
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+// If your network's DNS can't look up the database address, run with
+// DNS_SERVERS=1.1.1.1,8.8.8.8 to use public DNS for this script only.
+if (process.env.DNS_SERVERS) require('dns').setServers(process.env.DNS_SERVERS.split(','));
 const Product = require('../models/Product');
 
 const SITE = 'https://acecomputerslb.com';
