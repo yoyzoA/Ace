@@ -1,0 +1,9 @@
+{
+  "name": "ace-product-photos",
+  "private": true,
+  "type": "module",
+  "description": "Find, review and prepare product photos for acecomputerslb.com",
+  "dependencies": {
+    "sharp": "^0.33.5"
+  }
+}
