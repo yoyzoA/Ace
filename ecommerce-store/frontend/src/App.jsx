@@ -28,9 +28,9 @@ const App = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col pb-[60px] lg:pb-0">
       <Navbar />
-      <main className="flex-1 pb-16 lg:pb-0">
+      <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />

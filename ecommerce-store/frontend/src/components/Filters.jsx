@@ -3,119 +3,144 @@ import { getCategoryIcon } from '../data/categoryIcons';
 import PriceRangeSlider from './PriceRangeSlider';
 
 const pillClass = (active) =>
-  `flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+  `rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
     active
-      ? 'border-accent bg-accent text-canvas'
-      : 'border-line bg-panelStrong text-muted hover:border-accent/60 hover:text-ink'
+      ? 'border-accent bg-accent text-white'
+      : 'border-line bg-white text-ink hover:border-accent/60 hover:text-accent'
   }`;
 
-const Filters = ({ options, value, onChange, onReset, resultCount }) => {
+const categoryRowClass = (active) =>
+  `flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+    active ? 'bg-brandSoft font-semibold text-accent' : 'text-ink hover:bg-mist'
+  }`;
+
+const Group = ({ title, children }) => (
+  <div className="space-y-3 border-t border-line pt-5 first:border-t-0 first:pt-0">
+    <h3 className="font-display text-sm font-semibold text-ink">{title}</h3>
+    {children}
+  </div>
+);
+
+const Filters = ({ options, value, onChange, onReset, resultCount, totalCount }) => {
   const isAll = value.category === 'all';
 
   return (
-    <aside className="panel space-y-6 p-6">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-ink">Filters</p>
-          <p className="text-xs text-muted">{resultCount} results</p>
-        </div>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-muted">
+          <span className="font-semibold text-ink">{resultCount}</span>
+          {` of ${totalCount} products`}
+        </p>
         <button
           type="button"
-          className="text-xs font-semibold text-accent"
+          className="text-sm font-semibold text-accent hover:text-accentHover"
           onClick={onReset}
         >
           Reset
         </button>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wide text-muted">
-            Category
-          </label>
+      <Group title="Category">
+        <ul className="-mx-3 space-y-0.5">
+          <li>
+            <button type="button" onClick={() => onChange('category', 'all')} className={categoryRowClass(isAll)}>
+              <LayoutGrid className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+              <span className="flex-1">All categories</span>
+            </button>
+          </li>
+          {options.categories.map(({ name, count }) => {
+            const Icon = getCategoryIcon(name);
+            const active = value.category === name;
+            return (
+              <li key={name}>
+                <button
+                  type="button"
+                  onClick={() => onChange('category', name)}
+                  className={categoryRowClass(active)}
+                  aria-pressed={active}
+                >
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="flex-1">{name}</span>
+                  <span className={`text-xs ${active ? 'text-accent' : 'text-muted'}`}>{count}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </Group>
+
+      {!isAll && options.subcategories.length > 0 && (
+        <Group title="Type">
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => onChange('category', 'all')}
-              className={pillClass(isAll)}
+              onClick={() => onChange('subcategory', 'all')}
+              className={pillClass(value.subcategory === 'all')}
             >
-              <LayoutGrid className="h-3.5 w-3.5" />
               All
             </button>
-            {options.categories.map((category) => {
-              const Icon = getCategoryIcon(category);
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => onChange('category', category)}
-                  className={pillClass(value.category === category)}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {category}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {!isAll && options.subcategories.length > 0 && (
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wide text-muted">
-              Subcategory
-            </label>
-            <div className="flex flex-wrap gap-2">
+            {options.subcategories.map((subcategory) => (
               <button
+                key={subcategory}
                 type="button"
-                onClick={() => onChange('subcategory', 'all')}
-                className={pillClass(value.subcategory === 'all')}
+                onClick={() => onChange('subcategory', subcategory)}
+                className={pillClass(value.subcategory === subcategory)}
               >
-                All
+                {subcategory}
               </button>
-              {options.subcategories.map((subcategory) => (
-                <button
-                  key={subcategory}
-                  type="button"
-                  onClick={() => onChange('subcategory', subcategory)}
-                  className={pillClass(value.subcategory === subcategory)}
-                >
-                  {subcategory}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wide text-muted">
-            Brand
-          </label>
-          <select
-            className="w-full rounded-xl border border-line bg-panelStrong px-3 py-2 text-sm text-ink"
-            value={value.brand}
-            onChange={(event) => onChange('brand', event.target.value)}
-          >
-            <option value="all">All brands</option>
-            {options.brands.map((brand) => (
-              <option key={brand} value={brand}>
-                {brand}
-              </option>
             ))}
-          </select>
-        </div>
+          </div>
+        </Group>
+      )}
 
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wide text-muted">
-            Price
-          </label>
-          <PriceRangeSlider
-            bounds={options.priceBounds}
-            value={value.priceRange}
-            onChange={(range) => onChange('priceRange', range)}
+      <Group title="Brand">
+        <label htmlFor="brand-filter" className="sr-only">
+          Brand
+        </label>
+        <select
+          id="brand-filter"
+          className="field py-2.5"
+          value={value.brand}
+          onChange={(event) => onChange('brand', event.target.value)}
+        >
+          <option value="all">All brands</option>
+          {options.brands.map((brand) => (
+            <option key={brand} value={brand}>
+              {brand}
+            </option>
+          ))}
+        </select>
+      </Group>
+
+      <Group title="Price">
+        <PriceRangeSlider
+          bounds={options.priceBounds}
+          value={value.priceRange}
+          onChange={(range) => onChange('priceRange', range)}
+        />
+      </Group>
+
+      <Group title="Availability">
+        <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={value.inStock}
+            onChange={(event) => onChange('inStock', event.target.checked)}
+            className="h-4 w-4 rounded border-lineStrong accent-[var(--color-accent)]"
           />
-        </div>
-      </div>
-    </aside>
+          In stock only
+        </label>
+        <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={value.featured}
+            onChange={(event) => onChange('featured', event.target.checked)}
+            className="h-4 w-4 rounded border-lineStrong accent-[var(--color-accent)]"
+          />
+          Featured only
+        </label>
+      </Group>
+    </div>
   );
 };
 

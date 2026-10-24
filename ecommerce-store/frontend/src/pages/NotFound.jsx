@@ -8,27 +8,21 @@ const NotFound = () => {
   });
 
   return (
-    <div className="container flex flex-1 flex-col items-center justify-center gap-6 py-20 text-center">
-      <div className="panel max-w-lg space-y-4 p-10">
-        <p className="text-sm text-muted">404</p>
-        <h1 className="text-3xl font-semibold text-ink">Page not found</h1>
-        <p className="text-sm text-muted">
-          The catalog page you are looking for does not exist yet.
-        </p>
-        <Link to="/" className="btn-primary w-fit">
-          Go home
+    <div className="container flex flex-col items-center pt-16 text-center lg:pt-24">
+      <p className="font-display text-[7rem] font-light leading-none tracking-tighter text-brand sm:text-[9rem]">
+        404
+      </p>
+      <h1 className="mt-4 font-display text-3xl font-semibold text-ink">This page doesn&apos;t exist</h1>
+      <p className="mt-3 max-w-md text-muted">
+        The link may be old or mistyped. Try the catalog, or search from the bar at the top.
+      </p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link to="/products" className="btn-primary px-7 py-3">
+          Browse products
         </Link>
-        <div className="flex flex-wrap justify-center gap-4 pt-2 text-xs text-muted">
-          <Link to="/products" className="hover:text-accent">
-            Browse products
-          </Link>
-          <Link to="/faq" className="hover:text-accent">
-            FAQ
-          </Link>
-          <Link to="/contact" className="hover:text-accent">
-            Contact us
-          </Link>
-        </div>
+        <Link to="/" className="btn-outline px-7 py-3">
+          Go to home page
+        </Link>
       </div>
     </div>
   );

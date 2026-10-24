@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Banknote, Check, ImageOff, Minus, Plus, ShoppingBag, Store } from 'lucide-react';
 import ProductGrid from '../components/ProductGrid';
 import Breadcrumbs from '../components/Breadcrumbs';
+import { WhatsAppIcon } from '../components/BrandIcons';
 import { useCart } from '../context/CartContext';
 import { getProductById, getProducts } from '../services/api';
 import { formatPrice } from '../utils/formatters';
@@ -10,20 +12,49 @@ import { usePageStatus } from '../hooks/usePageStatus';
 import { siteConfig } from '../data/siteConfig';
 import { getAvailableStock } from '../utils/inventory';
 
+const LOW_STOCK = 3;
+
+const StockLine = ({ available }) => {
+  if (available <= 0) {
+    return (
+      <p className="flex items-center gap-2 text-sm font-semibold text-accentWarm">
+        <span className="h-2 w-2 rounded-full bg-accentWarm" aria-hidden="true" />
+        Out of stock
+      </p>
+    );
+  }
+  if (available <= LOW_STOCK) {
+    return (
+      <p className="flex items-center gap-2 text-sm font-semibold text-accentWarm">
+        <span className="h-2 w-2 rounded-full bg-accentWarm" aria-hidden="true" />
+        {`Only ${available} left in stock`}
+      </p>
+    );
+  }
+  return (
+    <p className="flex items-center gap-2 text-sm font-semibold text-success">
+      <span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />
+      In stock
+    </p>
+  );
+};
+
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [status, setStatus] = useState('idle');
-  const { addItem } = useCart();
+  const [activeImage, setActiveImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+  const { addItem, items } = useCart();
 
   usePageStatus(status);
 
   usePageMeta({
     title: product ? product.name : 'Product Details',
     description:
-      product?.description ||
-      'Explore specs, pricing, and availability for this product.'
+      product?.description || 'Explore specs, pricing, and availability for this product.'
   });
 
   useEffect(() => {
@@ -34,6 +65,9 @@ const ProductDetails = () => {
         setStatus('loading');
         setProduct(null);
         setRelated([]);
+        setActiveImage(0);
+        setQuantity(1);
+        setAdded(false);
         const data = await getProductById(id);
 
         if (!isActive) {
@@ -51,9 +85,7 @@ const ProductDetails = () => {
           }
 
           const suggestions = catalog
-            .filter(
-              (item) => item.category === data.category && item.id !== data.id
-            )
+            .filter((item) => item.category === data.category && item.id !== data.id)
             .slice(0, 4);
           setRelated(suggestions);
         } catch (error) {
@@ -74,163 +106,254 @@ const ProductDetails = () => {
     };
   }, [id]);
 
-  const highlightSpecs = product?.specs ? product.specs.slice(0, 4) : [];
   const available = product ? getAvailableStock(product) : 0;
   const isOutOfStock = available <= 0;
+  const inCart = product
+    ? items.find((item) => item.productId === String(product.id))?.quantity || 0
+    : 0;
+  const maxAddable = Math.max(available - inCart, 0);
+  const images = product?.images?.filter(Boolean) || [];
+
+  const handleAdd = () => {
+    if (!product || maxAddable <= 0) return;
+    addItem(product.id, Math.min(quantity, maxAddable));
+    setAdded(true);
+    setQuantity(1);
+  };
+
+  const whatsappText = product
+    ? encodeURIComponent(
+        `Hi ACE, I'm interested in: ${product.name} (${formatPrice(product.price)})\n${siteConfig.siteUrl}/products/${product.id}`
+      )
+    : '';
 
   return (
-    <div className="container space-y-10 py-12">
+    <div className="container space-y-12 pb-4 pt-8 lg:pt-10">
       <Breadcrumbs
         items={[
           { label: 'Products', path: '/products' },
+          ...(product?.category
+            ? [
+                {
+                  label: product.category,
+                  path: `/products?category=${encodeURIComponent(product.category)}`
+                }
+              ]
+            : []),
           { label: product ? product.name : 'Product', path: `/products/${id}` }
         ]}
       />
-      <Link to="/products" className="text-sm text-muted">
-        Back to catalog
-      </Link>
 
       {status === 'loading' && (
-        <div className="panel p-6 text-sm text-muted">Loading product...</div>
+        <div className="grid gap-10 lg:grid-cols-2" aria-label="Loading product">
+          <div className="aspect-square animate-pulse rounded-4xl bg-mist" />
+          <div className="space-y-4">
+            <div className="h-4 w-1/4 animate-pulse rounded bg-mist" />
+            <div className="h-9 w-4/5 animate-pulse rounded bg-mist" />
+            <div className="h-8 w-1/3 animate-pulse rounded bg-mist" />
+            <div className="h-24 animate-pulse rounded-2xl bg-mist" />
+          </div>
+        </div>
       )}
 
       {status === 'error' && (
-        <div className="panel space-y-4 p-6 text-sm text-muted">
-          <p>We could not load that product right now.</p>
-          <Link to="/products" className="btn-outline w-fit">
-            Back to products
+        <div className="rounded-2xl border border-line bg-mist p-10 text-center">
+          <p className="font-display text-xl font-medium text-ink">We couldn&apos;t find that product</p>
+          <p className="mt-2 text-sm text-muted">
+            It may have been removed from the catalog, or the link is wrong.
+          </p>
+          <Link to="/products" className="btn-primary mt-6">
+            Browse all products
           </Link>
         </div>
       )}
 
       {product && (
-        <div className="space-y-8">
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="panel overflow-hidden">
-              <div className="aspect-[4/3] bg-panelStrong">
-                {product.images?.[0] ? (
+        <>
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
+            {/* Gallery */}
+            <div className="space-y-3">
+              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-4xl bg-mist">
+                {images[activeImage] ? (
                   <img
-                    src={product.images[0]}
+                    src={images[activeImage]}
                     alt={product.name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
+                    className="h-full w-full object-contain p-8 mix-blend-multiply sm:p-12"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-xs text-muted">
-                    Image coming soon
+                  <div className="flex flex-col items-center gap-2 text-sm text-muted">
+                    <ImageOff className="h-8 w-8 text-silver" aria-hidden="true" />
+                    Photo coming soon
                   </div>
                 )}
               </div>
-              <div className="border-t border-line p-5 text-sm text-muted">
-                Cash on delivery available. Orders are confirmed by the ACE team.
-              </div>
+              {images.length > 1 && (
+                <div className="no-scrollbar flex gap-3 overflow-x-auto">
+                  {images.map((src, index) => (
+                    <button
+                      key={src}
+                      type="button"
+                      onClick={() => setActiveImage(index)}
+                      className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 bg-mist p-2 transition-colors ${
+                        index === activeImage ? 'border-accent' : 'border-transparent hover:border-line'
+                      }`}
+                      aria-label={`Show image ${index + 1}`}
+                      aria-pressed={index === activeImage}
+                    >
+                      <img src={src} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="panel flex flex-col gap-6 p-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="chip">{product.category}</span>
-                <span className="chip">{product.brand}</span>
-              </div>
-
-              <div>
-                <h1 className="text-3xl font-semibold text-ink">{product.name}</h1>
-                <p className="mt-3 text-2xl font-semibold text-accent">
+            {/* Buy box */}
+            <div className="flex flex-col gap-6">
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-muted">
+                  {product.brand}
+                  {product.subcategory ? <span className="text-silver"> / </span> : null}
+                  {product.subcategory}
+                </p>
+                <h1 className="font-display text-3xl font-medium leading-tight tracking-tight text-ink md:text-4xl">
+                  {product.name}
+                </h1>
+                <p className="font-display text-3xl font-semibold tracking-tight text-ink">
                   {formatPrice(product.price)}
                 </p>
-                {product.description && (
-                  <p className="mt-4 text-sm text-muted">{product.description}</p>
-                )}
+                <StockLine available={available} />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                {highlightSpecs.map((spec) => (
-                  <div
-                    key={`${product.id}-${spec.label}`}
-                    className="rounded-xl border border-line bg-panelStrong px-4 py-3"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      {spec.label}
-                    </p>
-                    <p className="text-sm text-ink">{spec.value}</p>
-                  </div>
-                ))}
-              </div>
+              {product.description && (
+                <p className="max-w-prose leading-relaxed text-muted">{product.description}</p>
+              )}
 
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  className="btn-primary"
-                  disabled={isOutOfStock}
-                  onClick={() => addItem(product.id, 1)}
-                >
-                  Add to cart
-                </button>
-                {isOutOfStock ? (
-                  <span className="self-center text-xs font-semibold uppercase tracking-wide text-accentWarm">
-                    Out of stock
-                  </span>
-                ) : null}
-                <button
-                  type="button"
-                  className="btn-outline"
-                  disabled
-                  title="Account coming soon"
-                >
-                  Save to wishlist
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-            <div className="panel p-6">
-              <h2 className="text-lg font-semibold text-ink">Full specifications</h2>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {product.specs?.map((spec) => (
-                  <div
-                    key={`${product.id}-full-${spec.label}`}
-                    className="flex items-center justify-between rounded-xl border border-line bg-panelStrong px-4 py-3 text-sm"
-                  >
-                    <span className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      {spec.label}
+              <div className="space-y-3 rounded-3xl border border-line p-4 sm:p-5">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <div className="flex h-12 items-center justify-between rounded-full border border-line px-1.5 sm:w-36">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      disabled={quantity <= 1 || isOutOfStock}
+                      className="flex h-9 w-9 items-center justify-center rounded-full text-ink hover:bg-mist disabled:opacity-40"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="min-w-[2ch] text-center font-semibold" aria-live="polite">
+                      {quantity}
                     </span>
-                    <span className="text-ink">{spec.value}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.min(maxAddable || 1, q + 1))}
+                      disabled={quantity >= maxAddable || isOutOfStock}
+                      className="flex h-9 w-9 items-center justify-center rounded-full text-ink hover:bg-mist disabled:opacity-40"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <button
+                    type="button"
+                    className="btn-primary h-12 flex-1 text-base"
+                    disabled={maxAddable <= 0}
+                    onClick={handleAdd}
+                  >
+                    <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+                    {isOutOfStock
+                      ? 'Out of stock'
+                      : maxAddable <= 0
+                        ? 'All available stock is in your cart'
+                        : 'Add to cart'}
+                  </button>
+                </div>
 
-            <div className="panel space-y-4 p-6">
-              <h2 className="text-lg font-semibold text-ink">Contact</h2>
-              <div className="rounded-xl border border-line bg-panelStrong p-4 text-sm text-muted">
-                {`Need bulk pricing? Reach out to sales at ${siteConfig.phone}.`}
-              </div>
-              <a
-                className="btn-outline w-fit"
-                href={`https://wa.me/${siteConfig.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  className="h-4 w-4"
-                  fill="currentColor"
+                {added && (
+                  <div
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-brandSoft px-4 py-3 text-sm"
+                    role="status"
+                  >
+                    <span className="flex items-center gap-2 font-semibold text-ink">
+                      <Check className="h-4 w-4 text-success" aria-hidden="true" />
+                      Added to cart
+                    </span>
+                    <Link to="/cart" className="font-semibold text-accent hover:text-accentHover">
+                      View cart
+                    </Link>
+                  </div>
+                )}
+
+                <a
+                  className="btn-outline h-12 w-full"
+                  href={`https://wa.me/${siteConfig.whatsapp}?text=${whatsappText}`}
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  <path d="M20.52 3.48A11.86 11.86 0 0 0 12.02 0C5.47 0 .16 5.3.16 11.85c0 2.1.55 4.15 1.6 5.97L0 24l6.36-1.67a11.86 11.86 0 0 0 5.66 1.45h.01c6.55 0 11.86-5.3 11.86-11.85 0-3.16-1.23-6.13-3.37-8.45zm-8.5 18.27h-.01a9.9 9.9 0 0 1-5.05-1.39l-.36-.21-3.77.99 1.01-3.67-.24-.38a9.87 9.87 0 0 1-1.52-5.24c0-5.44 4.43-9.87 9.88-9.87a9.88 9.88 0 0 1 6.98 2.89 9.82 9.82 0 0 1 2.89 6.98c0 5.45-4.43 9.9-9.81 9.9zm5.74-7.83c-.31-.16-1.82-.9-2.1-1-.28-.1-.49-.16-.7.16-.2.31-.8 1-.98 1.2-.18.2-.36.23-.67.08-.31-.16-1.31-.48-2.49-1.53-.92-.82-1.54-1.83-1.72-2.14-.18-.31-.02-.48.14-.63.14-.14.31-.36.47-.54.16-.18.2-.31.31-.52.1-.2.05-.39-.03-.54-.08-.16-.7-1.68-.96-2.31-.25-.6-.5-.52-.7-.53h-.6c-.2 0-.54.08-.82.39-.28.31-1.07 1.05-1.07 2.55 0 1.5 1.1 2.96 1.25 3.17.16.2 2.17 3.31 5.26 4.64.73.31 1.3.5 1.75.64.74.23 1.41.2 1.94.12.59-.09 1.82-.74 2.08-1.45.26-.7.26-1.3.18-1.45-.08-.16-.28-.25-.59-.41z" />
-                </svg>
-                WhatsApp
-              </a>
+                  <WhatsAppIcon className="h-4 w-4 text-[#1f9d55]" />
+                  Ask about this product
+                </a>
+              </div>
+
+              <ul className="grid gap-3 text-sm sm:grid-cols-2">
+                <li className="flex gap-3">
+                  <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.75} aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold text-ink">Cash on delivery</span>
+                    <span className="text-muted">Pay when your order arrives.</span>
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <Store className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.75} aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold text-ink">Pickup in Batroun</span>
+                    <span className="text-muted">Or delivery for a small fee.</span>
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
-        </div>
+
+          {/* Specs */}
+          {product.specs?.length > 0 && (
+            <section className="grid gap-8 lg:grid-cols-[1fr_2fr] lg:gap-14" aria-labelledby="specs-heading">
+              <div className="space-y-3">
+                <h2 id="specs-heading" className="section-title trace">
+                  Specifications
+                </h2>
+                <p className="text-sm text-muted">
+                  {`Questions about compatibility or bulk pricing? Call ${siteConfig.phone}.`}
+                </p>
+              </div>
+              <dl className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
+                {product.specs.map((spec, index) => (
+                  <div
+                    key={`${product.id}-spec-${spec.label}`}
+                    className={`grid grid-cols-[minmax(7rem,35%)_1fr] gap-4 px-5 py-3.5 text-sm ${
+                      index % 2 === 0 ? 'bg-mist/60' : 'bg-white'
+                    }`}
+                  >
+                    <dt className="text-muted">{spec.label}</dt>
+                    <dd className="font-medium text-ink">{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+        </>
       )}
 
       {related.length > 0 && (
         <ProductGrid
           products={related}
           title={`More in ${product?.category}`}
-          subtitle="Similar picks from the same category."
+          action={
+            <Link
+              to={`/products?category=${encodeURIComponent(product?.category || '')}`}
+              className="text-sm font-semibold text-accent hover:text-accentHover"
+            >
+              See all
+            </Link>
+          }
         />
       )}
     </div>

@@ -1,4 +1,7 @@
+import { Link } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 import Breadcrumbs from '../components/Breadcrumbs';
+import { WhatsAppIcon } from '../components/BrandIcons';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { siteConfig } from '../data/siteConfig';
 
@@ -48,21 +51,44 @@ const FAQ = () => {
   });
 
   return (
-    <div className="container space-y-10 py-12">
-      <Breadcrumbs items={[{ label: 'FAQ', path: '/faq' }]} />
-
-      <div className="space-y-3">
-        <p className="chip">FAQ</p>
-        <h1 className="text-3xl font-semibold text-ink">Frequently asked questions</h1>
-      </div>
-
-      <div className="space-y-4">
-        {faqs.map((item) => (
-          <div key={item.question} className="panel p-6">
-            <h2 className="text-base font-semibold text-ink">{item.question}</h2>
-            <p className="mt-2 text-sm text-muted">{item.answer}</p>
+    <div className="container pt-8 lg:pt-10">
+      <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+        <div className="space-y-4">
+          <Breadcrumbs items={[{ label: 'FAQ', path: '/faq' }]} />
+          <h1 className="page-title">Questions, answered</h1>
+          <p className="text-muted">
+            Payment, delivery, pickup and warranty. Can&apos;t find what you need? Ask us directly.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <a
+              href={`https://wa.me/${siteConfig.whatsapp}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-outline"
+            >
+              <WhatsAppIcon className="h-4 w-4 text-[#1f9d55]" />
+              WhatsApp us
+            </a>
+            <Link to="/contact" className="btn-outline">
+              Contact page
+            </Link>
           </div>
-        ))}
+        </div>
+
+        <div className="divide-y divide-line border-y border-line">
+          {faqs.map((item, index) => (
+            <details key={item.question} className="group" open={index === 0}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 [&::-webkit-details-marker]:hidden">
+                <h2 className="font-display text-lg font-medium text-ink">{item.question}</h2>
+                <ChevronDown
+                  className="h-5 w-5 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180 group-open:text-accent"
+                  aria-hidden="true"
+                />
+              </summary>
+              <p className="max-w-prose pb-6 leading-relaxed text-muted">{item.answer}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </div>
   );
