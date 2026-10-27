@@ -85,6 +85,15 @@ jobs:
 
       - name: Create application version
         run: |
+          # A re-run of the same commit finds its version already there; reuse it.
+          EXISTING=$(aws elasticbeanstalk describe-application-versions \
+            --application-name Ace-Website \
+            --version-labels ${{ github.sha }} \
+            --query 'length(ApplicationVersions)' --output text)
+          if [ "$EXISTING" != "0" ]; then
+            echo "Version ${{ github.sha }} already exists, reusing it."
+            exit 0
+          fi
           aws elasticbeanstalk create-application-version \
             --application-name Ace-Website \
             --version-label ${{ github.sha }} \
