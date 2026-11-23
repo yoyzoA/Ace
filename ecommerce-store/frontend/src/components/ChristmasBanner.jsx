@@ -79,7 +79,7 @@ const ChristmasBanner = ({ products = [], compact = false }) => {
 
   return (
     <section
-      className="relative overflow-hidden rounded-4xl text-white"
+      className="xmas-snowfall relative overflow-hidden rounded-4xl text-white"
       style={{ background: 'linear-gradient(135deg, #0d2b3e 0%, #12384f 45%, #231f20 100%)' }}
       aria-labelledby="xmas-heading"
     >
