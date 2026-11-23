@@ -58,7 +58,48 @@ export const christmas = {
     '6a37eeb93ccba133dd119816', // Blackview Tab 9
     '6a37ee443ccba133dd118d44', // iPad 7
     '6a37eec93ccba133dd1199a3', // Xiaomi Electric Scooter 5
-    '695e55680482de50a21e1f9e' // Lenovo LOQ
+    '695e55680482de50a21e1f9e', // Lenovo LOQ
+    // More picks
+    '6a37ee743ccba133dd119199', // Joy-Con pair SW020
+    '6a37ee6e3ccba133dd11911d', // LEGO 2K Drive (Switch)
+    '6a37ee713ccba133dd11915d', // Nintendo Switch Sports
+    '6a37ee713ccba133dd119165', // Hot Wheels Unleashed (Switch)
+    '6a37ee6f3ccba133dd119131', // LEGO The Incredibles (Switch)
+    '6a37ee703ccba133dd119141', // Mario + Rabbids: Sparks of Hope
+    '6a37ee703ccba133dd11913d', // Super Mario Odyssey
+    '6a37ee923ccba133dd119478', // EA Sports FC 25 (PS5)
+    '6a37ee973ccba133dd1194d8', // Spider-Man: Miles Morales (PS5)
+    '6a37ee933ccba133dd11948c', // God of War Ragnarok (PS5)
+    '6a37ee963ccba133dd1194c8', // Need for Speed Unbound (PS5)
+    '6a37ee943ccba133dd119498', // Harry Potter: Quidditch Champions (PS5)
+    '6a37ee953ccba133dd1194b8', // Mortal Kombat 1 (PS5)
+    '6a37edff3ccba133dd1186ed', // Kingston 64GB microSD
+    '6a37ee023ccba133dd11873b', // Green Lion smart glasses
+    '6a37ee7e3ccba133dd1192a1', // iPega PS5 stand
+    '69873b9c6837f9c37b4555be', // Meetion K9300 rainbow keyboard
+    '698744a86837f9c37b45563c', // Meetion GM19 RGB mouse
+    '698742426837f9c37b45560a', // Meetion CP3030 cooling pad
+    '6a37ee3b3ccba133dd118c76', // Okade 15.6" laptop bag
+    '6a37ee0e3ccba133dd118837', // Awei T3 wireless earbuds
+    '6a37ee103ccba133dd118873', // Fantech HQ56 headphones
+    '6a37ee143ccba133dd1188d0', // Meetion HP020 gaming headset
+    '6a37ee553ccba133dd118ebc', // Fortnite mouse pad
+    '6a37eea53ccba133dd11963d', // Beats Pill speaker
+    '6a37ee313ccba133dd118b81', // Meetion 4-in-1 gaming combo
+    '69873d836837f9c37b4555cd', // Meetion MK01 RGB mechanical keyboard
+    '6a37ee7c3ccba133dd119276', // DualSense, black
+    '6a37ee993ccba133dd11950b', // PXN V9 racing wheel
+    '6a37ee143ccba133dd1188c6', // Marshall Monitor headphones
+    '6a37ee133ccba133dd1188ad', // JBL Tune 500BT
+    '6a37ee043ccba133dd118768', // Xiaomi TV Box S
+    '6a37ee0a3ccba133dd1187d2', // Seagate 2TB external drive
+    '6a37ee4d3ccba133dd118e0a', // Dahua 24" 144Hz monitor
+    '6a37ee733ccba133dd119191', // Nintendo Joy-Con (original)
+    '6a37ee7b3ccba133dd11924a', // PlayStation Pulse wireless headset
+    '6a37eeb53ccba133dd1197c3', // Fantech gaming desk
+    '6a37eeb93ccba133dd119811', // Blackview Mega 2 tablet
+    '6a37ee803ccba133dd1192d8', // Logitech G29 racing wheel
+    '695e49530482de50a21e1f71' // Lenovo X1 Carbon
   ],
   budgets: [
     { id: 'stocking', title: 'Stocking stuffers', note: 'Under $50', max: 50 },
