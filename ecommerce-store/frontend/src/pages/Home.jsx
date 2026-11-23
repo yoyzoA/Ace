@@ -10,6 +10,8 @@ import { getCategoryIcon } from '../data/categoryIcons';
 import { formatPrice } from '../utils/formatters';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { usePageStatus } from '../hooks/usePageStatus';
+import ChristmasBanner from '../components/ChristmasBanner';
+import { isChristmasSeason } from '../data/christmas';
 
 const serviceIcons = [Banknote, Store, Headset];
 
@@ -134,6 +136,12 @@ const Home = () => {
 
   return (
     <div>
+      {isChristmasSeason() && (
+        <div className="container pt-6 md:pt-8">
+          <ChristmasBanner products={products} />
+        </div>
+      )}
+
       {/* Hero */}
       <section className="container grid items-center gap-10 pb-16 pt-10 md:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pb-24 lg:pt-20">
         <div className="max-w-xl space-y-7">

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, Phone, MapPin, Search, ShoppingBag, X } from 'lucide-react';
+import { Gift, Menu, Phone, MapPin, Search, ShoppingBag, X } from 'lucide-react';
+import { christmas, isChristmasSeason } from '../data/christmas';
 import { siteConfig } from '../data/siteConfig';
 import { useCart } from '../context/CartContext';
 import Logo from './Logo';
@@ -10,6 +11,21 @@ const getLinkClass = ({ isActive }) =>
   `relative py-2 text-sm font-medium transition-colors ${
     isActive ? 'text-accent' : 'text-ink hover:text-accent'
   }`;
+
+// During the Christmas season, a "Christmas gifts" link sits right after Home.
+const navItems = isChristmasSeason()
+  ? [siteConfig.navItems[0], { label: christmas.navLabel, path: christmas.path, festive: true }, ...siteConfig.navItems.slice(1)]
+  : siteConfig.navItems;
+
+const NavLabel = ({ item }) =>
+  item.festive ? (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      <Gift className="h-4 w-4 text-[#d8433b]" aria-hidden="true" />
+      {item.label}
+    </span>
+  ) : (
+    item.label
+  );
 
 const telHref = `tel:${siteConfig.phone.replace(/\s+/g, '')}`;
 
@@ -103,9 +119,9 @@ const Navbar = () => {
           </Link>
 
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
-            {siteConfig.navItems.map((item) => (
+            {navItems.map((item) => (
               <NavLink key={item.path} to={item.path} end={item.path === '/'} className={getLinkClass}>
-                {item.label}
+                <NavLabel item={item} />
               </NavLink>
             ))}
           </nav>
@@ -158,7 +174,7 @@ const Navbar = () => {
               </button>
             </div>
             <nav className="flex flex-col px-2 py-4" aria-label="Mobile">
-              {siteConfig.navItems.map((item) => (
+              {navItems.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}
@@ -169,7 +185,7 @@ const Navbar = () => {
                     }`
                   }
                 >
-                  {item.label}
+                  <NavLabel item={item} />
                 </NavLink>
               ))}
             </nav>

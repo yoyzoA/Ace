@@ -14,6 +14,7 @@ import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import NotFound from './pages/NotFound';
+import ChristmasGifts from './pages/ChristmasGifts';
 import { initAnalytics, trackPageView } from './utils/analytics';
 
 const App = () => {
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success/:id" element={<OrderSuccess />} />
+          <Route path="/christmas" element={<ChristmasGifts />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
