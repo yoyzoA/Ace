@@ -3,6 +3,11 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 
 const DELIVERY_FEE = 5;
+// Limits that stop fake or abusive orders without getting in a real customer's way.
+const MAX_LINES = 20; // different products in one order
+const MAX_QUANTITY = 10; // units of one product
+const MAX_PENDING_PER_PHONE = 3; // undelivered orders for one phone number
+const MAX_LENGTH = { name: 80, phone: 30, location: 300 };
 
 const createHttpError = (status, message) => {
   const error = new Error(message);
@@ -240,6 +245,17 @@ const createOrder = async (req, res) => {
       throw createHttpError(400, 'Customer name, phone, and location are required.');
     }
 
+    Object.entries(MAX_LENGTH).forEach(([field, max]) => {
+      if (customer[field].length > max) {
+        throw createHttpError(400, `Please shorten the ${field} (up to ${max} characters).`);
+      }
+    });
+
+    const phoneDigits = customer.phone.replace(/\D/g, '');
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+      throw createHttpError(400, 'Please enter a valid phone number.');
+    }
+
     const itemsInput = Array.isArray(req.body?.items) ? req.body.items : [];
     if (!itemsInput.length) {
       throw createHttpError(400, 'Cart items are required.');
@@ -254,6 +270,33 @@ const createOrder = async (req, res) => {
 
     if (!items.length || items.length !== itemsInput.length) {
       throw createHttpError(400, 'Invalid cart items.');
+    }
+
+    if (items.length > MAX_LINES) {
+      throw createHttpError(400, `An order can hold up to ${MAX_LINES} different products.`);
+    }
+
+    if (items.some((item) => item.quantity > MAX_QUANTITY)) {
+      throw createHttpError(
+        400,
+        `You can order up to ${MAX_QUANTITY} of each product online. For more, please call or WhatsApp us.`
+      );
+    }
+
+    if (new Set(items.map((item) => item.productId)).size !== items.length) {
+      throw createHttpError(400, 'Invalid cart items.');
+    }
+
+    // Same phone number with several orders still waiting: likely a mistake or abuse.
+    const pendingForPhone = await Order.countDocuments({
+      status: 'Pending',
+      'customer.phone': customer.phone
+    });
+    if (pendingForPhone >= MAX_PENDING_PER_PHONE) {
+      throw createHttpError(
+        429,
+        'You already have orders waiting to be delivered. Please call or WhatsApp us to add to them.'
+      );
     }
 
     const productIds = items.map((item) => {
