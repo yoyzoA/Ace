@@ -65,12 +65,13 @@ const registerIpcHandlers = () => {
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 1240,
-    height: 820,
-    minWidth: 1024,
-    minHeight: 720,
+    width: 1320,
+    height: 860,
+    minWidth: 400,
+    minHeight: 560,
     autoHideMenuBar: true,
-    backgroundColor: '#f4f1ea',
+    title: 'ACE Admin',
+    backgroundColor: '#f4f6f8',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
