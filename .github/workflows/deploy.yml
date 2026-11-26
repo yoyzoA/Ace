@@ -43,7 +43,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Sync to S3
-        run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete
+        run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete --exclude "uploads/*"
 
       - name: Invalidate CloudFront
         id: invalidate
@@ -61,7 +61,7 @@ jobs:
         run: npm run prerender
 
       - name: Sync prerendered snapshots to S3
-        run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete
+        run: aws s3 sync ecommerce-store/frontend/dist s3://acecomputerslb.com --delete --exclude "uploads/*"
 
       - name: Invalidate CloudFront again
         run: aws cloudfront create-invalidation --distribution-id E3A66148P05R1M --paths "/*"
