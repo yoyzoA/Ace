@@ -7,6 +7,7 @@ import {
   Moon,
   Package,
   Search,
+  Settings,
   ShoppingBag,
   Sun,
   X
@@ -161,6 +162,16 @@ function Shell({ onLogout }) {
       <div className="mt-auto space-y-1 border-t border-white/10 pt-4">
         {MOCK_MODE ? (
           <p className="mb-2 rounded-lg bg-brand/15 px-3 py-2 text-xs text-brand">Preview with sample data</p>
+        ) : null}
+        {window.adminShell?.openSettings ? (
+          <button
+            type="button"
+            onClick={() => window.adminShell.openSettings()}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <Settings className="h-[18px] w-[18px]" aria-hidden="true" />
+            Connection settings
+          </button>
         ) : null}
         <button
           type="button"

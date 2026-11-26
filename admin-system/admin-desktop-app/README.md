@@ -26,7 +26,16 @@ cd admin-system/admin-backend && npm install
 cd ../admin-desktop-app && npm install
 ```
 
-`admin-system/admin-backend/.env` needs `MONGODB_URI`, `JWT_SECRET`, `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+**Installed app:** on first run it asks for the database connection string and the admin email and
+password (or loads them from an existing `.env` file), creates a strong sign-in key, and stores them in
+`%APPDATA%\ACE Admin\admin-settings.env` on that PC. The installer itself contains no secrets, so it
+can be copied to another PC safely. Change them later from **Connection settings** in the sidebar.
+
+**Development:** `admin-system/admin-backend/.env` (see `.env.example`) needs `MONGODB_URI`,
+`JWT_SECRET` (32+ random characters), `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+
+**Security:** the admin server only accepts connections from the same computer (127.0.0.1), and
+sign-in pauses for 15 minutes after 5 wrong attempts.
 
 ## Run
 

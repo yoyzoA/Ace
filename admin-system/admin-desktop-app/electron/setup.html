@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; img-src 'self' data:" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Set up ACE Admin</title>
+    <style>
+      :root {
+        --bg: #f4f6f8;
+        --panel: #ffffff;
+        --ink: #181c21;
+        --muted: #646e7a;
+        --line: #dfe4e9;
+        --accent: #0a76ab;
+        --danger: #c43a34;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111418;
+          --panel: #1a1e23;
+          --ink: #e9edf1;
+          --muted: #949eaa;
+          --line: #2e353d;
+          --accent: #4cb0e6;
+          --danger: #ef6e66;
+          color-scheme: dark;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.5 'Segoe UI', system-ui, sans-serif;
+      }
+      main {
+        width: 100%;
+        max-width: 520px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 28px;
+      }
+      h1 { margin: 0 0 4px; font-size: 22px; }
+      p.lead { margin: 0 0 20px; color: var(--muted); }
+      .import {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+      .import span { color: var(--muted); font-size: 13px; }
+      label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 14px 0 6px; }
+      input {
+        width: 100%;
+        padding: 9px 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--ink);
+        font: inherit;
+      }
+      input:focus { outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent); border-color: var(--accent); }
+      .error { color: var(--danger); font-size: 12px; margin-top: 4px; min-height: 0; }
+      .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+      button {
+        font: inherit;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 9px 16px;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        white-space: nowrap;
+      }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; width: 100%; margin-top: 22px; padding: 11px; }
+      button:disabled { opacity: 0.6; cursor: default; }
+      .note { margin-top: 16px; font-size: 12px; color: var(--muted); }
+      .banner { padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; display: none; }
+      .banner.show { display: block; }
+      .banner.ok { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+      .banner.bad { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Set up ACE Admin</h1>
+      <p class="lead">These settings stay on this computer only. They're not part of the installer.</p>
+
+      <div id="banner" class="banner" role="status"></div>
+
+      <div class="import">
+        <span>Have the admin server's <b>.env</b> file? Load it to fill this in.</span>
+        <button type="button" id="import">Load .env file</button>
+      </div>
+
+      <form id="form" novalidate>
+        <label for="MONGODB_URI">Database connection string</label>
+        <input id="MONGODB_URI" autocomplete="off" spellcheck="false" placeholder="mongodb+srv://user:password@cluster0…" />
+        <div class="error" id="MONGODB_URI-error"></div>
+
+        <label for="ADMIN_EMAIL">Admin email</label>
+        <input id="ADMIN_EMAIL" type="email" autocomplete="off" />
+        <div class="error" id="ADMIN_EMAIL-error"></div>
+
+        <label for="ADMIN_PASSWORD">Admin password</label>
+        <input id="ADMIN_PASSWORD" type="password" autocomplete="new-password" />
+        <div class="error" id="ADMIN_PASSWORD-error"></div>
+        <div class="hint" id="strength"></div>
+
+        <button type="submit" class="primary" id="save">Save and open the admin app</button>
+      </form>
+
+      <p class="note">A strong sign-in key is created for you. To change them later, use <b>Connection settings</b> in the app's sidebar. Leave the password empty there to keep the current one.</p>
+    </main>
+    <script src="./setup.js"></script>
+  </body>
+</html>

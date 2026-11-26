@@ -35,7 +35,7 @@
   },
   "build": {
     "appId": "com.ace.admin",
-    "productName": "Ace Admin Console",
+    "productName": "ACE Admin",
     "directories": {
       "output": "release"
     },
@@ -47,7 +47,14 @@
     "extraResources": [
       {
         "from": "../admin-backend",
-        "to": "admin-backend"
+        "to": "admin-backend",
+        "filter": [
+          "**/*",
+          "!.env",
+          "!.env.*",
+          "!uploads/**",
+          "!scripts/**"
+        ]
       }
     ],
     "win": {
