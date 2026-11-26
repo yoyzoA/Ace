@@ -1,5 +1,5 @@
 // Script for the first-run settings window (setup.html).
-const fields = ['MONGODB_URI', 'ADMIN_EMAIL', 'ADMIN_PASSWORD'];
+const fields = ['MONGODB_URI', 'ADMIN_EMAIL', 'ADMIN_PASSWORD', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
 const $ = (id) => document.getElementById(id);
 let imported = {};
 
@@ -22,7 +22,12 @@ const fill = (values) => {
   strength();
 };
 
-window.adminSetup.load().then((current) => fill(current || {}));
+window.adminSetup.load().then((current) => {
+  fill(current || {});
+  // Saved secrets aren't shown; leaving them empty keeps them.
+  if (current?.hasPassword) $('ADMIN_PASSWORD').placeholder = 'Saved. Leave empty to keep it.';
+  if (current?.hasAwsSecret) $('AWS_SECRET_ACCESS_KEY').placeholder = 'Saved. Leave empty to keep it.';
+});
 
 $('ADMIN_PASSWORD').addEventListener('input', strength);
 

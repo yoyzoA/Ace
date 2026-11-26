@@ -5,7 +5,20 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const KEYS = ['MONGODB_URI', 'ADMIN_EMAIL', 'ADMIN_PASSWORD', 'JWT_SECRET', 'JWT_EXPIRES_IN', 'ADMIN_CORS_ORIGINS'];
+const KEYS = [
+  'MONGODB_URI',
+  'ADMIN_EMAIL',
+  'ADMIN_PASSWORD',
+  'JWT_SECRET',
+  'JWT_EXPIRES_IN',
+  'ADMIN_CORS_ORIGINS',
+  // Optional: photo uploads to the website's S3 bucket
+  'AWS_ACCESS_KEY_ID',
+  'AWS_SECRET_ACCESS_KEY',
+  'S3_BUCKET',
+  'S3_REGION',
+  'PUBLIC_ASSET_BASE'
+];
 
 const settingsFile = (app) => path.join(app.getPath('userData'), 'admin-settings.env');
 
@@ -56,6 +69,17 @@ const validate = (values) => {
   }
   if (!values.ADMIN_PASSWORD || values.ADMIN_PASSWORD.length < 8) {
     errors.ADMIN_PASSWORD = 'Use at least 8 characters (12 or more is better).';
+  }
+  const keyId = values.AWS_ACCESS_KEY_ID || '';
+  const secret = values.AWS_SECRET_ACCESS_KEY || '';
+  if (keyId && !/^(AKIA|ASIA)[A-Z0-9]{12,}$/.test(keyId)) {
+    errors.AWS_ACCESS_KEY_ID = 'Access key IDs start with AKIA, like AKIAXXXXXXXXXXXXXXXX.';
+  }
+  if (keyId && !secret) {
+    errors.AWS_SECRET_ACCESS_KEY = 'Add the secret access key that goes with this key ID.';
+  }
+  if (secret && !keyId) {
+    errors.AWS_ACCESS_KEY_ID = 'Add the access key ID that goes with this secret.';
   }
   return errors;
 };

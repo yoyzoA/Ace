@@ -166,7 +166,13 @@ const registerIpcHandlers = () => {
   // Current values for the setup form. The password and signing key stay hidden.
   ipcMain.handle('setup:load', () => {
     const saved = settings.readSettings(app) || {};
-    return { MONGODB_URI: saved.MONGODB_URI || '', ADMIN_EMAIL: saved.ADMIN_EMAIL || '' };
+    return {
+      MONGODB_URI: saved.MONGODB_URI || '',
+      ADMIN_EMAIL: saved.ADMIN_EMAIL || '',
+      AWS_ACCESS_KEY_ID: saved.AWS_ACCESS_KEY_ID || '',
+      hasPassword: Boolean(saved.ADMIN_PASSWORD),
+      hasAwsSecret: Boolean(saved.AWS_SECRET_ACCESS_KEY)
+    };
   });
 
   ipcMain.handle('setup:import', async (event) => {
@@ -191,9 +197,11 @@ const registerIpcHandlers = () => {
 
   ipcMain.handle('setup:save', async (event, input) => {
     const previous = settings.readSettings(app) || {};
-    const values = { ...previous, ...input };
-    // Leaving the password empty when changing settings keeps the old one.
-    if (!input.ADMIN_PASSWORD && previous.ADMIN_PASSWORD) values.ADMIN_PASSWORD = previous.ADMIN_PASSWORD;
+    // Fields left empty keep their saved value (so passwords and keys needn't be retyped).
+    const values = { ...previous };
+    Object.entries(input || {}).forEach(([key, value]) => {
+      if (settings.KEYS.includes(key) && String(value || '').trim()) values[key] = String(value).trim();
+    });
     const errors = settings.validate(values);
     if (Object.keys(errors).length) return { errors };
     settings.writeSettings(app, values);

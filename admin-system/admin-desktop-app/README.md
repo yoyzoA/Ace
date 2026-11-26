@@ -11,8 +11,8 @@ It starts its own admin server (`../admin-backend`) in the background.
   and brand filters, sorting, 50 per page. Click a price or stock number to change it in place. The
   Website switch and the featured star save immediately. Tick several products to show, hide,
   feature, move to a category or delete them together. Export the current list to Excel (CSV).
-- **Product editor** (side panel): details, subcategory, photo links with previews and ordering,
-  specifications, duplicate and delete.
+- **Product editor** (side panel): details, subcategory, photos (upload, drag in or paste; or a
+  link) with previews and ordering, specifications, duplicate and delete.
 - **Orders**: pending / all / completed / cancelled tabs, search by number, customer, phone or
   product, date range, and orders waiting 2+ days flagged. The order panel has WhatsApp, call and
   copy buttons, a copyable order summary, and Mark as delivered / Cancel.
@@ -53,3 +53,28 @@ $env:VITE_ADMIN_MOCK="true"; npm run dev:renderer
 
 Opens the console at http://localhost:5173 with made-up orders and a sample of the catalog. Nothing
 is read from or written to the database in this mode.
+
+## Photo uploads (S3)
+
+Uploaded photos are trimmed, centred on white, resized to 800×800 WebP and stored in the website's
+bucket under `uploads/products/`. The deploy workflow never deletes that folder.
+
+One-time AWS setup: create an IAM user (for example `ace-admin-uploads`) with no console access and
+only this inline policy, create an access key for it, and enter the key in **Connection settings**:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::acecomputerslb.com/uploads/*"
+    }
+  ]
+}
+```
+
+The key can only add files to `uploads/`. It can't read, list, change or delete anything else.
+Optional settings: `S3_BUCKET`, `S3_REGION`, `PUBLIC_ASSET_BASE` (defaults: `acecomputerslb.com`,
+`eu-central-1`, `https://acecomputerslb.com`).

@@ -88,6 +88,9 @@
       button.primary { background: var(--accent); border-color: var(--accent); color: #fff; width: 100%; margin-top: 22px; padding: 11px; }
       button:disabled { opacity: 0.6; cursor: default; }
       .note { margin-top: 16px; font-size: 12px; color: var(--muted); }
+      fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px 14px; margin: 22px 0 0; }
+      legend { font-weight: 600; padding: 0 6px; }
+      .optional { font-weight: 500; color: var(--muted); font-size: 12px; }
       .banner { padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; display: none; }
       .banner.show { display: block; }
       .banner.ok { background: color-mix(in srgb, var(--accent) 12%, transparent); }
@@ -119,6 +122,18 @@
         <input id="ADMIN_PASSWORD" type="password" autocomplete="new-password" />
         <div class="error" id="ADMIN_PASSWORD-error"></div>
         <div class="hint" id="strength"></div>
+
+        <fieldset>
+          <legend>Photo uploads <span class="optional">optional</span></legend>
+          <p class="hint">Lets you upload product photos straight to the website. Use the upload-only AWS key, not your main AWS login.</p>
+          <label for="AWS_ACCESS_KEY_ID">AWS access key ID</label>
+          <input id="AWS_ACCESS_KEY_ID" autocomplete="off" spellcheck="false" placeholder="AKIA…" />
+          <div class="error" id="AWS_ACCESS_KEY_ID-error"></div>
+
+          <label for="AWS_SECRET_ACCESS_KEY">AWS secret access key</label>
+          <input id="AWS_SECRET_ACCESS_KEY" type="password" autocomplete="off" spellcheck="false" />
+          <div class="error" id="AWS_SECRET_ACCESS_KEY-error"></div>
+        </fieldset>
 
         <button type="submit" class="primary" id="save">Save and open the admin app</button>
       </form>

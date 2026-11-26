@@ -8,6 +8,7 @@ const categoryRoutes = require('./routes/categories');
 const brandRoutes = require('./routes/brands');
 const orderRoutes = require('./routes/orders');
 const analyticsRoutes = require('./routes/analytics');
+const uploadRoutes = require('./routes/uploads');
 const { requireAuth } = require('./middleware/auth');
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use('/admin/categories', requireAuth, categoryRoutes);
 app.use('/admin/brands', requireAuth, brandRoutes);
 app.use('/admin/orders', requireAuth, orderRoutes);
 app.use('/admin/analytics', requireAuth, analyticsRoutes);
+app.use('/admin/uploads', requireAuth, uploadRoutes);
 
 app.use((err, req, res, next) => {
   if (res.headersSent) {

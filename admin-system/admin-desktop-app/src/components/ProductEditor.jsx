@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Copy, ImagePlus, Loader2, Plus, Star, Trash2, X } from 'lucide-react';
-import { Drawer, Switch, Thumb } from './ui';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, ArrowUp, Copy, ImagePlus, Loader2, Plus, Star, Trash2, UploadCloud, X } from 'lucide-react';
+import { Drawer, Switch, Thumb, useToast } from './ui';
+import { getErrorMessage, getUploadStatus, uploadImages } from '../api/adminApi';
 import { available } from '../lib/format';
 
 const blank = {
@@ -63,6 +64,61 @@ export default function ProductEditor({
   const [form, setForm] = useState(blank);
   const [newImage, setNewImage] = useState('');
   const [touched, setTouched] = useState(false);
+  const [uploading, setUploading] = useState(null); // { count, progress }
+  const [dragging, setDragging] = useState(false);
+  const [uploadsReady, setUploadsReady] = useState(true);
+  const fileInput = useRef(null);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!open) return;
+    getUploadStatus()
+      .then((status) => setUploadsReady(Boolean(status?.configured)))
+      .catch(() => setUploadsReady(true));
+  }, [open]);
+
+  const uploadFiles = async (fileList) => {
+    const files = [...(fileList || [])].filter((file) => file.type.startsWith('image/'));
+    if (!files.length) {
+      toast({ tone: 'error', message: 'Choose photo files (JPG, PNG or WebP).' });
+      return;
+    }
+    if (files.length > 10) {
+      toast({ tone: 'error', message: 'Upload up to 10 photos at a time.' });
+      return;
+    }
+    const tooBig = files.find((file) => file.size > 15 * 1024 * 1024);
+    if (tooBig) {
+      toast({ tone: 'error', message: `“${tooBig.name}” is over 15 MB.` });
+      return;
+    }
+    setUploading({ count: files.length, progress: 0 });
+    try {
+      const uploaded = await uploadImages(files, (progress) => setUploading({ count: files.length, progress }));
+      setForm((f) => ({ ...f, images: [...f.images, ...uploaded.map((u) => u.url)] }));
+      toast(`${uploaded.length} photo${uploaded.length === 1 ? '' : 's'} uploaded. Save the product to keep ${uploaded.length === 1 ? 'it' : 'them'}.`);
+    } catch (error) {
+      const partial = error?.response?.data?.uploaded;
+      if (partial?.length) setForm((f) => ({ ...f, images: [...f.images, ...partial.map((u) => u.url)] }));
+      toast({ tone: 'error', message: getErrorMessage(error) });
+    } finally {
+      setUploading(null);
+      if (fileInput.current) fileInput.current.value = '';
+    }
+  };
+
+  // Paste a copied photo (Ctrl+V) anywhere in the editor to upload it.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onPaste = (event) => {
+      const files = [...(event.clipboardData?.files || [])].filter((file) => file.type.startsWith('image/'));
+      if (!files.length || uploading) return;
+      event.preventDefault();
+      uploadFiles(files);
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) return;
@@ -137,7 +193,7 @@ export default function ProductEditor({
             <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>
               Cancel
             </button>
-            <button type="submit" form="product-form" className="btn-primary" disabled={saving}>
+            <button type="submit" form="product-form" className="btn-primary" disabled={saving || Boolean(uploading)}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {saving ? 'Saving…' : product ? 'Save changes' : 'Add product'}
             </button>
@@ -256,11 +312,69 @@ export default function ProductEditor({
               ))}
             </ul>
           ) : (
-            <div className="flex items-center gap-3 rounded-xl border border-dashed border-line p-4 text-sm text-muted">
-              <ImagePlus className="h-5 w-5 shrink-0" aria-hidden="true" />
+            <p className="flex items-center gap-2 text-sm text-muted">
+              <ImagePlus className="h-4 w-4 shrink-0" aria-hidden="true" />
               No photos yet. The website shows “Photo coming soon” until you add one.
-            </div>
+            </p>
           )}
+
+          {/* Upload: click, drag and drop, or paste */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (!uploading) setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              if (!uploading) uploadFiles(e.dataTransfer.files);
+            }}
+            className={`rounded-xl border-2 border-dashed p-4 text-center transition-colors ${
+              dragging ? 'border-accent bg-accentSoft' : 'border-line'
+            }`}
+          >
+            <input
+              ref={fileInput}
+              id="pf-upload"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+              multiple
+              className="sr-only"
+              onChange={(e) => uploadFiles(e.target.files)}
+            />
+            {uploading ? (
+              <div className="space-y-2" role="status">
+                <p className="flex items-center justify-center gap-2 text-sm font-medium text-ink">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  {uploading.progress < 1
+                    ? `Uploading ${uploading.count} photo${uploading.count === 1 ? '' : 's'}…`
+                    : 'Preparing photos for the website…'}
+                </p>
+                <div className="mx-auto h-1.5 max-w-xs overflow-hidden rounded-full bg-sunken">
+                  <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${Math.round(uploading.progress * 100)}%` }} />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <UploadCloud className="mx-auto h-7 w-7 text-muted" aria-hidden="true" />
+                <p className="text-sm text-ink">
+                  <label htmlFor="pf-upload" className="cursor-pointer font-semibold text-accent hover:underline">
+                    Upload photos
+                  </label>{' '}
+                  or drag them here. You can also paste a copied photo.
+                </p>
+                <p className="text-xs text-muted">
+                  JPG, PNG or WebP, up to 10 at a time. Each is trimmed, centred on white and resized to 800×800.
+                </p>
+                {!uploadsReady ? (
+                  <p className="rounded-lg bg-warnSoft px-3 py-2 text-xs text-warn">
+                    Photo uploads aren’t set up yet. Add the AWS upload key in Connection settings. You can still paste a photo link below.
+                  </p>
+                ) : null}
+              </div>
+            )}
+          </div>
           <div className="flex gap-2">
             <label htmlFor="pf-newimage" className="sr-only">
               Photo link
@@ -276,7 +390,7 @@ export default function ProductEditor({
                   addImage();
                 }
               }}
-              placeholder="Paste a photo link (https://…)"
+              placeholder="Or paste a photo link (https://…)"
             />
             <button type="button" className="btn-secondary" onClick={addImage} disabled={!newImage.trim()}>
               <Plus className="h-4 w-4" />

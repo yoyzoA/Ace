@@ -209,3 +209,32 @@ export const getAnalyticsSummary = async () => {
   const response = await client.get('/admin/analytics/summary');
   return response.data;
 };
+
+/* ---------- Photo uploads ---------- */
+
+export const getUploadStatus = async () => {
+  if (MOCK_MODE) return { configured: true };
+  const response = await client.get('/admin/uploads/status');
+  return response.data;
+};
+
+// Uploads photos; the server cleans them up and stores them on the website.
+// Returns [{ url, name }]. onProgress gets a number from 0 to 1.
+export const uploadImages = async (files, onProgress = () => {}) => {
+  if (MOCK_MODE) {
+    for (let p = 0.2; p <= 1; p += 0.2) {
+      onProgress(p);
+      await new Promise((r) => setTimeout(r, 120));
+    }
+    return [...files].map((file) => ({ url: URL.createObjectURL(file), name: file.name }));
+  }
+  const form = new FormData();
+  [...files].forEach((file) => form.append('photos', file, file.name));
+  const response = await client.post('/admin/uploads/images', form, {
+    timeout: 120000,
+    onUploadProgress: (event) => {
+      if (event.total) onProgress(event.loaded / event.total);
+    }
+  });
+  return response.data?.uploaded || [];
+};
