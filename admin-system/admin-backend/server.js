@@ -8,6 +8,7 @@ const categoryRoutes = require('./routes/categories');
 const brandRoutes = require('./routes/brands');
 const orderRoutes = require('./routes/orders');
 const analyticsRoutes = require('./routes/analytics');
+const uploadRoutes = require('./routes/uploads');
 const { requireAuth } = require('./middleware/auth');
 
 dotenv.config();
@@ -33,8 +34,8 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 };
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.disable('x-powered-by');
+app.use(express.json({ limit: '1mb' }));
 
 app.use('/admin/auth', authRoutes);
 app.use('/admin/products', requireAuth, productRoutes);
@@ -42,6 +43,7 @@ app.use('/admin/categories', requireAuth, categoryRoutes);
 app.use('/admin/brands', requireAuth, brandRoutes);
 app.use('/admin/orders', requireAuth, orderRoutes);
 app.use('/admin/analytics', requireAuth, analyticsRoutes);
+app.use('/admin/uploads', requireAuth, uploadRoutes);
 
 app.use((err, req, res, next) => {
   if (res.headersSent) {
@@ -60,10 +62,18 @@ const startServer = async () => {
     if (!MONGODB_URI) {
       throw new Error('MONGODB_URI is not set');
     }
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
+      throw new Error('JWT_SECRET is missing or too short (use 32+ random characters).');
+    }
+    if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+      throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set');
+    }
 
     await mongoose.connect(MONGODB_URI);
-    app.listen(PORT, () => {
-      console.log(`Admin backend running on port ${PORT}`);
+    // Only this computer can reach the admin server, not others on the same Wi-Fi.
+    const HOST = process.env.HOST || '127.0.0.1';
+    app.listen(PORT, HOST, () => {
+      console.log(`Admin backend running on http://${HOST}:${PORT}`);
     });
   } catch (error) {
     console.error('Failed to start admin backend', error);

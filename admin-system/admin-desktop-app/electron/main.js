@@ -1,8 +1,12 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 const { spawn } = require('child_process');
+const fs = require('fs');
 const path = require('path');
+const settings = require('./settings');
 
 let backendProcess = null;
+let mainWindow = null;
+let setupWindow = null;
 const BACKEND_PORT = '4000';
 
 const resolveBackendPath = () => {
@@ -12,6 +16,9 @@ const resolveBackendPath = () => {
   return path.join(__dirname, '..', '..', 'admin-backend');
 };
 
+// During development the admin server can still read its own .env file.
+const hasDevEnvFile = () => !app.isPackaged && fs.existsSync(path.join(resolveBackendPath(), '.env'));
+
 const startBackend = () => {
   if (backendProcess) {
     return;
@@ -19,9 +26,12 @@ const startBackend = () => {
 
   const backendPath = resolveBackendPath();
   const entryPoint = path.join(backendPath, 'server.js');
+  const saved = settings.readSettings(app) || {};
   const env = {
     ...process.env,
+    ...saved,
     PORT: BACKEND_PORT,
+    HOST: '127.0.0.1',
     ELECTRON_RUN_AS_NODE: '1'
   };
 
@@ -47,51 +57,178 @@ const startBackend = () => {
   });
 };
 
-const stopBackend = () => {
-  if (backendProcess && !backendProcess.killed) {
+const stopBackend = () =>
+  new Promise((resolve) => {
+    if (!backendProcess || backendProcess.killed) {
+      backendProcess = null;
+      resolve();
+      return;
+    }
+    backendProcess.once('exit', () => resolve());
     backendProcess.kill();
     backendProcess = null;
-  }
+    setTimeout(resolve, 1500);
+  });
+
+// Only links the app actually uses: web pages, phone calls, WhatsApp and email.
+const SAFE_PROTOCOLS = new Set(['https:', 'http:', 'tel:', 'mailto:', 'whatsapp:']);
+
+const secureWebPreferences = {
+  contextIsolation: true,
+  nodeIntegration: false,
+  sandbox: true,
+  preload: path.join(__dirname, 'preload.js')
 };
 
-const registerIpcHandlers = () => {
-  ipcMain.handle('shell:openExternal', (event, url) => {
-    if (!url || typeof url !== 'string') {
-      throw new Error('Invalid URL.');
+// Keep every window on the app's own pages; anything else opens in the browser.
+const lockNavigation = (win, allowedPrefix) => {
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    try {
+      if (SAFE_PROTOCOLS.has(new URL(url).protocol)) shell.openExternal(url);
+    } catch {
+      /* ignore malformed links */
     }
-    return shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  win.webContents.on('will-navigate', (event, url) => {
+    if (!url.startsWith(allowedPrefix)) event.preventDefault();
   });
 };
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 1240,
-    height: 820,
-    minWidth: 1024,
-    minHeight: 720,
+  mainWindow = new BrowserWindow({
+    width: 1320,
+    height: 860,
+    minWidth: 400,
+    minHeight: 560,
     autoHideMenuBar: true,
-    backgroundColor: '#f4f1ea',
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      preload: path.join(__dirname, 'preload.js')
-    }
+    title: 'ACE Admin',
+    backgroundColor: '#f4f6f8',
+    webPreferences: secureWebPreferences
   });
 
   const devServerUrl = process.env.VITE_DEV_SERVER_URL;
   if (!app.isPackaged && devServerUrl) {
+    lockNavigation(mainWindow, devServerUrl);
     mainWindow.loadURL(devServerUrl);
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    const file = path.join(__dirname, '../dist/index.html');
+    lockNavigation(mainWindow, 'file://');
+    mainWindow.loadFile(file);
   }
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+};
+
+const openSetupWindow = () => {
+  if (setupWindow) {
+    setupWindow.focus();
+    return;
+  }
+  setupWindow = new BrowserWindow({
+    width: 600,
+    height: 720,
+    minWidth: 380,
+    minHeight: 520,
+    autoHideMenuBar: true,
+    title: 'Set up ACE Admin',
+    parent: mainWindow || undefined,
+    modal: Boolean(mainWindow),
+    backgroundColor: '#f4f6f8',
+    webPreferences: secureWebPreferences
+  });
+  lockNavigation(setupWindow, 'file://');
+  setupWindow.loadFile(path.join(__dirname, 'setup.html'));
+  setupWindow.on('closed', () => {
+    setupWindow = null;
+    // Closed on first run without saving: nothing to open, so quit.
+    if (!mainWindow && !settings.isComplete(settings.readSettings(app)) && !hasDevEnvFile()) app.quit();
+  });
+};
+
+const registerIpcHandlers = () => {
+  ipcMain.handle('shell:openExternal', (event, url) => {
+    let parsed;
+    try {
+      parsed = new URL(String(url || ''));
+    } catch {
+      throw new Error('Invalid link.');
+    }
+    if (!SAFE_PROTOCOLS.has(parsed.protocol)) {
+      throw new Error('This kind of link is not allowed.');
+    }
+    return shell.openExternal(parsed.toString());
+  });
+
+  ipcMain.handle('settings:open', () => openSetupWindow());
+
+  // Current values for the setup form. The password and signing key stay hidden.
+  ipcMain.handle('setup:load', () => {
+    const saved = settings.readSettings(app) || {};
+    return {
+      MONGODB_URI: saved.MONGODB_URI || '',
+      ADMIN_EMAIL: saved.ADMIN_EMAIL || '',
+      AWS_ACCESS_KEY_ID: saved.AWS_ACCESS_KEY_ID || '',
+      hasPassword: Boolean(saved.ADMIN_PASSWORD),
+      hasAwsSecret: Boolean(saved.AWS_SECRET_ACCESS_KEY)
+    };
+  });
+
+  ipcMain.handle('setup:import', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showOpenDialog(win, {
+      title: 'Choose the admin server .env file',
+      properties: ['openFile', 'showHiddenFiles']
+    });
+    if (result.canceled || !result.filePaths[0]) return null;
+    try {
+      const values = settings.parseEnv(fs.readFileSync(result.filePaths[0], 'utf8'));
+      if (!values.MONGODB_URI) return { error: 'That file has no MONGODB_URI line. Choose the admin server .env file.' };
+      const picked = {};
+      settings.KEYS.forEach((key) => {
+        if (values[key]) picked[key] = values[key];
+      });
+      return { values: picked };
+    } catch {
+      return { error: "Couldn't read that file." };
+    }
+  });
+
+  ipcMain.handle('setup:save', async (event, input) => {
+    const previous = settings.readSettings(app) || {};
+    // Fields left empty keep their saved value (so passwords and keys needn't be retyped).
+    const values = { ...previous };
+    Object.entries(input || {}).forEach(([key, value]) => {
+      if (settings.KEYS.includes(key) && String(value || '').trim()) values[key] = String(value).trim();
+    });
+    const errors = settings.validate(values);
+    if (Object.keys(errors).length) return { errors };
+    settings.writeSettings(app, values);
+
+    await stopBackend();
+    startBackend();
+    if (mainWindow) {
+      mainWindow.reload();
+    } else {
+      createWindow();
+    }
+    setupWindow?.close();
+    return { ok: true };
+  });
 };
 
 app.setAppUserModelId('com.ace.admin');
 
 app.whenReady().then(() => {
-  startBackend();
   registerIpcHandlers();
-  createWindow();
+
+  if (settings.isComplete(settings.readSettings(app)) || hasDevEnvFile()) {
+    startBackend();
+    createWindow();
+  } else {
+    openSetupWindow();
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

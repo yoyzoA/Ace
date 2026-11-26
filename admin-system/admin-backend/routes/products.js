@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const router = express.Router();
 
@@ -123,6 +124,60 @@ router.post('/', async (req, res) => {
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ message: 'Failed to create product.' });
+  }
+});
+
+const MAX_BULK = 2000;
+const BULK_FIELDS = ['published', 'featured', 'category', 'subcategory', 'brand'];
+
+// Apply one change to many products at once, or delete them.
+// Body: { ids: [...], action: 'update' | 'delete', set: { published?, featured?, category?, subcategory?, brand? } }
+router.post('/bulk', async (req, res) => {
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(String) : [];
+    const action = req.body?.action;
+
+    if (!ids.length) {
+      return res.status(400).json({ message: 'Select at least one product.' });
+    }
+    if (ids.length > MAX_BULK) {
+      return res.status(400).json({ message: `You can change up to ${MAX_BULK} products at once.` });
+    }
+    if (!ids.every((id) => mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({ message: 'One or more product ids are invalid.' });
+    }
+
+    if (action === 'delete') {
+      const result = await Product.deleteMany({ _id: { $in: ids } });
+      return res.json({ matched: result.deletedCount, modified: result.deletedCount });
+    }
+
+    if (action !== 'update') {
+      return res.status(400).json({ message: 'Action must be update or delete.' });
+    }
+
+    const input = req.body?.set || {};
+    const set = {};
+    BULK_FIELDS.forEach((field) => {
+      if (!hasOwn(input, field)) return;
+      if (field === 'published' || field === 'featured') {
+        set[field] = normalizeBoolean(input[field]);
+      } else {
+        set[field] = normalizeString(input[field]);
+      }
+    });
+
+    if (!Object.keys(set).length) {
+      return res.status(400).json({ message: 'Nothing to change.' });
+    }
+    if ((hasOwn(set, 'category') && !set.category) || (hasOwn(set, 'brand') && !set.brand)) {
+      return res.status(400).json({ message: 'Category and brand cannot be empty.' });
+    }
+
+    const result = await Product.updateMany({ _id: { $in: ids } }, { $set: set });
+    return res.json({ matched: result.matchedCount, modified: result.modifiedCount });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to update products.' });
   }
 });
 

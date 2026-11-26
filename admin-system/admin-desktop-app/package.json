@@ -14,7 +14,10 @@
     "dist:win": "npm run build && electron-builder --win --x64"
   },
   "dependencies": {
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource-variable/outfit": "^5.3.0",
     "axios": "^1.6.8",
+    "lucide-react": "^1.81.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -32,7 +35,7 @@
   },
   "build": {
     "appId": "com.ace.admin",
-    "productName": "Ace Admin Console",
+    "productName": "ACE Admin",
     "directories": {
       "output": "release"
     },
@@ -44,7 +47,14 @@
     "extraResources": [
       {
         "from": "../admin-backend",
-        "to": "admin-backend"
+        "to": "admin-backend",
+        "filter": [
+          "**/*",
+          "!.env",
+          "!.env.*",
+          "!uploads/**",
+          "!scripts/**"
+        ]
       }
     ],
     "win": {

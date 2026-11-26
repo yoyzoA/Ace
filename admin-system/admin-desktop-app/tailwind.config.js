@@ -1,45 +1,52 @@
 /** @type {import('tailwindcss').Config} */
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 module.exports = {
   content: ['./index.html', './src/**/*.{js,jsx}'],
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Space Grotesk"', 'Segoe UI', 'sans-serif']
+        sans: ['"Instrument Sans Variable"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        display: ['"Outfit Variable"', '"Segoe UI"', 'system-ui', 'sans-serif']
       },
       colors: {
-        canvas: 'rgb(var(--canvas) / <alpha-value>)',
-        panel: 'rgb(var(--panel) / <alpha-value>)',
-        ink: 'rgb(var(--ink) / <alpha-value>)',
-        muted: 'rgb(var(--muted) / <alpha-value>)',
-        accent: 'rgb(var(--accent) / <alpha-value>)',
-        accentSoft: 'rgb(var(--accent-soft) / <alpha-value>)',
-        highlight: 'rgb(var(--highlight) / <alpha-value>)',
-        outline: 'rgb(var(--outline) / <alpha-value>)',
-        danger: 'rgb(var(--danger) / <alpha-value>)',
-        success: 'rgb(var(--success) / <alpha-value>)'
+        canvas: token('canvas'),
+        panel: token('panel'),
+        sunken: token('sunken'),
+        ink: token('ink'),
+        muted: token('muted'),
+        line: token('line'),
+        brand: token('brand'),
+        accent: token('accent'),
+        accentSoft: token('accent-soft'),
+        sidebar: token('sidebar'),
+        warn: token('warn'),
+        warnSoft: token('warn-soft'),
+        danger: token('danger'),
+        dangerSoft: token('danger-soft'),
+        success: token('success'),
+        successSoft: token('success-soft')
       },
       boxShadow: {
-        panel: '0 20px 40px -30px rgba(15, 23, 42, 0.35)',
-        pop: '0 12px 30px -18px rgba(15, 23, 42, 0.45)'
+        card: '0 1px 2px rgb(15 23 42 / 0.06), 0 1px 1px rgb(15 23 42 / 0.03)',
+        pop: '0 24px 48px -16px rgb(15 23 42 / 0.35)'
       },
       keyframes: {
         'fade-up': {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' }
         },
-        'fade-in': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' }
+        'slide-in': {
+          '0%': { transform: 'translateX(24px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' }
         },
-        'pulse-soft': {
-          '0%, 100%': { opacity: '0.6' },
-          '50%': { opacity: '1' }
-        }
+        'fade-in': { '0%': { opacity: '0' }, '100%': { opacity: '1' } }
       },
       animation: {
-        'fade-up': 'fade-up 0.5s ease-out',
-        'fade-in': 'fade-in 0.3s ease-out',
-        'pulse-soft': 'pulse-soft 2.2s ease-in-out infinite'
+        'fade-up': 'fade-up 0.25s ease-out',
+        'slide-in': 'slide-in 0.25s ease-out',
+        'fade-in': 'fade-in 0.2s ease-out'
       }
     }
   },
