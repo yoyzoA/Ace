@@ -32,7 +32,7 @@ import {
   productId,
   updateProduct
 } from '../api/adminApi';
-import { available, formatMoney, timeAgo } from '../lib/format';
+import { available, formatMoney, isSecondHand, timeAgo } from '../lib/format';
 import { downloadCsv, today } from '../lib/csv';
 
 const PAGE_SIZE = 50;
@@ -43,6 +43,7 @@ const VIEWS = [
   { id: 'shown', label: 'On website', test: (p) => p.published !== false },
   { id: 'hidden', label: 'Hidden', test: (p) => p.published === false },
   { id: 'featured', label: 'Featured', test: (p) => p.featured },
+  { id: 'secondHand', label: 'Second-hand', test: (p) => isSecondHand(p) },
   { id: 'noPhoto', label: 'No photo', test: (p) => !(p.images || []).length },
   { id: 'low', label: 'Low stock', test: (p) => available(p) > 0 && available(p) <= LOW_STOCK },
   { id: 'out', label: 'Out of stock', test: (p) => available(p) <= 0 }
@@ -486,6 +487,12 @@ export default function Products({ intent, clearIntent }) {
           <button type="button" className="btn-secondary py-1.5" disabled={bulkBusy} onClick={() => bulk({ featured: false }, 'Unfeatured')}>
             Unfeature
           </button>
+          <button type="button" className="btn-secondary py-1.5" disabled={bulkBusy} onClick={() => bulk({ condition: 'used' }, 'Marked as second-hand:')}>
+            Second-hand
+          </button>
+          <button type="button" className="btn-secondary py-1.5" disabled={bulkBusy} onClick={() => bulk({ condition: 'new' }, 'Marked as new:')}>
+            New
+          </button>
           <div className="flex items-center gap-1">
             <select className="field w-auto py-1.5" value={moveTo} onChange={(e) => setMoveTo(e.target.value)} aria-label="Move to category">
               <option value="">Move to category…</option>
@@ -571,8 +578,9 @@ export default function Products({ intent, clearIntent }) {
                           <Thumb src={p.images?.[0]} />
                           <span className="min-w-0">
                             <span className="block truncate font-medium text-ink hover:text-accent">{p.name}</span>
-                            <span className="block truncate text-xs text-muted">
-                              {[p.brand, p.category, p.subcategory].filter(Boolean).join(' · ')}
+                            <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted">
+                              {isSecondHand(p) ? <span className="chip shrink-0 bg-sunken text-ink">Second-hand</span> : null}
+                              <span className="truncate">{[p.brand, p.category, p.subcategory].filter(Boolean).join(' · ')}</span>
                             </span>
                           </span>
                         </button>

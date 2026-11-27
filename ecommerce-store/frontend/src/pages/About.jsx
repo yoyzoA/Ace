@@ -8,7 +8,7 @@ const whatWeDo = [
   {
     Icon: Cpu,
     title: 'Hardware that fits',
-    text: 'Laptops, components, monitors, networking and accessories, chosen with you for what you actually need.'
+    text: 'Laptops, consoles, games, components and accessories, chosen with you for what you actually need.'
   },
   {
     Icon: Headset,
@@ -26,7 +26,7 @@ const About = () => {
   usePageMeta({
     title: 'About & Team',
     description:
-      'ACE Computers SARL has served Batroun, Lebanon with computer hardware and internet services since 1998. Meet the team behind the store.'
+      'ACE Computers SARL, the computers and games store in Batroun, Lebanon, established in 1996 and an internet service provider since 1998. Meet the team behind the store.'
   });
 
   return (
@@ -35,10 +35,10 @@ const About = () => {
         <Breadcrumbs items={[{ label: 'About', path: '/about' }]} />
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end lg:gap-16">
           <h1 className="font-display text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-ink md:text-5xl">
-            25+ years of helping Batroun get the right tech.
+            {new Date().getFullYear() - siteConfig.established} years of helping Batroun get the right tech.
           </h1>
           <p className="text-lg leading-relaxed text-muted">
-            {`${siteConfig.name} is a computer and multimedia store in Batroun, Lebanon, and an internet service provider since 1998. We help customers pick the right hardware, build custom PCs, and get reliable support after the sale.`}
+            {`${siteConfig.name} is a computers and games store in Batroun, Lebanon, established in ${siteConfig.established}, and an internet service provider since 1998. We help customers pick the right hardware, build custom PCs, and get reliable support after the sale.`}
           </p>
         </div>
       </div>

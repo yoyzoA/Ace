@@ -6,8 +6,8 @@ const Logo = ({ className = 'h-11' }) => (
       src={siteConfig.logoMark || siteConfig.logo}
       alt={`${siteConfig.name} logo`}
       className={`${className} w-auto object-contain`}
-      width="448"
-      height="221"
+      width="793"
+      height="283"
     />
     <span className="sr-only">{siteConfig.name}</span>
   </>

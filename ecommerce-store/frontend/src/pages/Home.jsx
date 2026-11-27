@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Banknote, Headset, ImageOff, MapPin, Store } from 'lucide-react';
+import { Banknote, Headset, ImageOff, MapPin, Recycle, Speaker, Store } from 'lucide-react';
 import ProductGrid from '../components/ProductGrid';
 import Testimonials, { Stars } from '../components/Testimonials';
 import { WhatsAppIcon } from '../components/BrandIcons';
 import { getProducts } from '../services/api';
 import { siteConfig } from '../data/siteConfig';
 import { getCategoryIcon } from '../data/categoryIcons';
+import { collections } from '../data/collections';
 import { formatPrice } from '../utils/formatters';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { usePageStatus } from '../hooks/usePageStatus';
@@ -88,7 +89,7 @@ const Home = () => {
   usePageMeta({
     title: 'Home',
     description:
-      'Laptops, PC components, monitors, networking and accessories from ACE Computers SARL in Batroun, Lebanon. Cash on delivery and in-store pickup.'
+      'Computers and games store in Batroun, Lebanon, since 1996: laptops, consoles, games, PC parts and accessories. Pay cash or with Whish, pick up in store or get it delivered.'
   });
 
   const [products, setProducts] = useState([]);
@@ -128,10 +129,25 @@ const Home = () => {
       if (!product.category) return;
       counts.set(product.category, (counts.get(product.category) || 0) + 1);
     });
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 8)
-      .map(([name, count]) => ({ name, count }));
+    // Speakers and Second-hand first (they span several categories), then the biggest categories.
+    const pinned = [
+      { id: 'speakers', Icon: Speaker },
+      { id: 'second-hand', Icon: Recycle }
+    ]
+      .map(({ id, Icon }) => ({
+        name: collections[id].label,
+        count: products.filter(collections[id].test).length,
+        to: id === 'second-hand' ? '/second-hand' : `/products?collection=${id}`,
+        Icon
+      }))
+      .filter((tile) => tile.count > 0);
+    return [
+      ...pinned,
+      ...Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8 - pinned.length)
+        .map(([name, count]) => ({ name, count }))
+    ];
   }, [products]);
 
   return (
@@ -199,12 +215,12 @@ const Home = () => {
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {categories.map(({ name, count }) => {
-              const Icon = getCategoryIcon(name);
+            {categories.map(({ name, count, to, Icon: PinnedIcon }) => {
+              const Icon = PinnedIcon || getCategoryIcon(name);
               return (
                 <Link
                   key={name}
-                  to={`/products?category=${encodeURIComponent(name)}`}
+                  to={to || `/products?category=${encodeURIComponent(name)}`}
                   className="group flex items-center gap-3 rounded-2xl border border-line bg-white p-3 transition-colors hover:border-brand/60 hover:bg-brandSoft/40 sm:gap-4 sm:p-4"
                 >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mist text-accent transition-colors group-hover:bg-white sm:h-12 sm:w-12">

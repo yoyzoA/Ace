@@ -118,6 +118,7 @@ const productPayload = (input) => {
   if (has('stock')) out.stock = Math.max(0, Math.floor(Number(input.stock) || 0));
   if (has('featured')) out.featured = Boolean(input.featured);
   if (has('published')) out.published = Boolean(input.published);
+  if (has('condition')) out.condition = input.condition === 'used' ? 'used' : 'new';
   if (has('images')) out.images = cleanImages(input.images);
   if (has('specs')) out.specs = cleanSpecs(input.specs);
   return out;

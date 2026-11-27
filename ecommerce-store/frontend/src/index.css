@@ -6,7 +6,7 @@
 
 /*
   ACE palette — taken from the logo:
-  #24AAE1 ace blue · #231F20 charcoal · #BCBDC0 silver
+  #014FDA ace blue (accent) · #3D7FF5 bright blue · #231F20 charcoal · #BCBDC0 silver
 */
 :root {
   --color-canvas: #ffffff;
@@ -17,11 +17,11 @@
   --color-line-strong: #bcbdc0;
   --color-ink: #231f20;
   --color-muted: #5e6166;
-  --color-brand: #24aae1;
+  --color-brand: #3d7ff5;
   --color-brand-soft: #e3f4fb;
   --color-silver: #bcbdc0;
   --color-charcoal: #231f20;
-  --color-accent: #0a76ab;
+  --color-accent: #014fda;
   --color-accent-hover: #086a9b;
   --color-warn: #b4461b;
   --color-success: #1f7a4d;

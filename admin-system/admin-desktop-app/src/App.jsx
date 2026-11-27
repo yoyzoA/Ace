@@ -140,7 +140,7 @@ function Shell({ onLogout }) {
   const sidebarBody = (
     <>
       <div className="flex items-center gap-3 px-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1"><img src="./ace-logo-mark.png" alt="" className="h-full w-full object-contain" /></span>
+        <span className="flex h-9 items-center rounded-lg bg-white px-2 py-1.5"><img src="./ace-logo-mark.png" alt="" className="h-full w-auto object-contain" /></span>
         <div className="leading-tight">
           <p className="font-display text-[15px] font-semibold text-white">ACE Computers</p>
           <p className="text-[11px] text-white/50">Admin console</p>
@@ -219,7 +219,7 @@ function Shell({ onLogout }) {
           <button type="button" className="icon-btn" onClick={() => setMenuOpen(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </button>
-          <img src="./ace-logo-mark.png" alt="" className="h-6 w-6 object-contain" />
+          <img src="./ace-logo-mark.png" alt="" className="h-5 w-auto object-contain" />
           <span className="font-display font-semibold text-ink">{PAGES.find((p) => p.id === page)?.label}</span>
           <button type="button" className="icon-btn ml-auto" onClick={() => setPaletteOpen(true)} aria-label="Search">
             <Search className="h-5 w-5" />

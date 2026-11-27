@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Check, ImageOff, Plus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils/formatters';
+import { isSecondHand } from '../data/collections';
 import { getAvailableStock } from '../utils/inventory';
 
 const LOW_STOCK = 3;
@@ -12,6 +13,7 @@ const ProductCard = ({ product }) => {
   const image = product.images?.[0];
   const available = getAvailableStock(product);
   const isOutOfStock = available <= 0;
+  const secondHand = isSecondHand(product);
   const isLowStock = !isOutOfStock && available <= LOW_STOCK;
   const { addItem } = useCart();
   const [justAdded, setJustAdded] = useState(false);
@@ -56,7 +58,7 @@ const ProductCard = ({ product }) => {
             </div>
           )}
 
-          {(isOutOfStock || isLowStock || product.featured) && (
+          {(isOutOfStock || isLowStock || product.featured || secondHand) && (
             <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
               {isOutOfStock ? (
                 <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-accentWarm shadow-sm">
@@ -67,8 +69,13 @@ const ProductCard = ({ product }) => {
                   {`Only ${available} left`}
                 </span>
               ) : null}
+              {secondHand && (
+                <span className="rounded-full bg-charcoal px-2.5 py-1 text-xs font-semibold text-white">
+                  Second-hand
+                </span>
+              )}
               {product.featured && !isOutOfStock && (
-                <span className="rounded-full bg-brand px-2.5 py-1 text-xs font-semibold text-charcoal">
+                <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">
                   Featured
                 </span>
               )}

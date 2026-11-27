@@ -5,7 +5,7 @@ export const XMAS = {
   red: '#d8433b',
   green: '#2f8f5b',
   gold: '#e9b44c',
-  blue: '#24aae1'
+  blue: '#3d7ff5'
 };
 
 const BULB_COLORS = [XMAS.red, XMAS.gold, XMAS.green, XMAS.blue];

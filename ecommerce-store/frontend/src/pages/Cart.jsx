@@ -257,7 +257,7 @@ const Cart = () => {
           >
             Proceed to checkout
           </button>
-          <p className="text-center text-xs text-muted">Pay cash on delivery. No card needed.</p>
+          <p className="text-center text-xs text-muted">Pay cash on delivery or with Whish. No card needed.</p>
           <Link to="/products" className="block text-center text-sm font-semibold text-accent hover:text-accentHover">
             Continue shopping
           </Link>

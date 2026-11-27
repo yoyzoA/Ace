@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext';
 import Logo from './Logo';
 
 const getLinkClass = ({ isActive }) =>
-  `relative py-2 text-sm font-medium transition-colors ${
+  `relative whitespace-nowrap py-2 text-sm font-medium transition-colors ${
     isActive ? 'text-accent' : 'text-ink hover:text-accent'
   }`;
 
@@ -93,7 +93,7 @@ const Navbar = () => {
             {siteConfig.location}
           </a>
           <div className="flex items-center gap-6">
-            <span>Cash on delivery &amp; in-store pickup</span>
+            <span>Since {siteConfig.established} · Pay cash or with Whish · Pickup or delivery</span>
             <a href={telHref} className="flex items-center gap-1.5 font-medium text-white hover:text-brand">
               <Phone className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
               {siteConfig.phone}
@@ -103,7 +103,7 @@ const Navbar = () => {
       </div>
 
       <div className="border-b border-line">
-        <div className="container flex h-16 items-center gap-4 lg:h-[4.5rem] lg:gap-8">
+        <div className="container flex h-16 items-center gap-4 lg:h-[4.5rem] lg:gap-6 xl:gap-8">
           <button
             type="button"
             className="-ml-2 flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-mist lg:hidden"
@@ -118,7 +118,7 @@ const Navbar = () => {
             <Logo className="h-9 lg:h-11" />
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
+          <nav className="hidden items-center gap-5 lg:flex xl:gap-7" aria-label="Main">
             {navItems.map((item) => (
               <NavLink key={item.path} to={item.path} end={item.path === '/'} className={getLinkClass}>
                 <NavLabel item={item} />
@@ -126,7 +126,7 @@ const Navbar = () => {
             ))}
           </nav>
 
-          <HeaderSearch className="ml-auto hidden w-full max-w-xs md:block xl:max-w-sm" />
+          <HeaderSearch className="ml-auto hidden w-full min-w-[8.5rem] max-w-xs md:block xl:max-w-sm" />
 
           <Link
             to="/cart"
@@ -137,7 +137,7 @@ const Navbar = () => {
             <span className="hidden sm:inline">Cart</span>
             <span
               className={`flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-xs font-bold ${
-                totalItems ? 'bg-brand text-charcoal' : 'bg-white/15 text-white/80'
+                totalItems ? 'bg-brand text-white' : 'bg-white/15 text-white/80'
               }`}
             >
               {totalItems || 0}

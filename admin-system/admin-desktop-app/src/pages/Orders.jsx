@@ -26,6 +26,8 @@ const RANGES = [
   { id: '30', label: 'Last 30 days', days: 30 }
 ];
 
+const paymentLabel = (order) => (order.paymentMethod === 'WHISH' ? 'Whish' : 'Cash on delivery');
+
 const itemCount = (order) => (order.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0);
 const ageDays = (order) => (Date.now() - new Date(order.createdAt).getTime()) / 86400000;
 
@@ -42,7 +44,7 @@ const orderSummaryText = (order) =>
     `ACE Computers order ${orderNumber(order)}`,
     ...(order.items || []).map((i) => `• ${i.quantity} × ${i.name} — ${formatMoney(i.price * i.quantity)}`),
     `Delivery: ${formatMoney(order.deliveryFee)}`,
-    `Total: ${formatMoney(order.total)} (cash on delivery)`,
+    `Total: ${formatMoney(order.total)} (${paymentLabel(order).toLowerCase()})`,
     `Deliver to: ${order.customer?.name || ''}, ${order.customer?.location || ''}`
   ].join('\n');
 
@@ -168,7 +170,7 @@ function OrderPanel({ order, onClose, onStatus, busy }) {
               <dt>Total</dt>
               <dd className="tabular">{formatMoney(order.total)}</dd>
             </div>
-            <p className="pt-1 text-xs text-muted">Payment: {order.paymentMethod === 'COD' || !order.paymentMethod ? 'Cash on delivery' : order.paymentMethod}</p>
+            <p className="pt-1 text-xs text-muted">Payment: <span className="font-semibold text-ink">{paymentLabel(order)}</span></p>
           </dl>
         </section>
 
@@ -280,6 +282,7 @@ export default function Orders({ intent, clearIntent }) {
       { label: 'Subtotal', value: (o) => o.subtotal },
       { label: 'Delivery', value: (o) => o.deliveryFee },
       { label: 'Total', value: (o) => o.total },
+      { label: 'Payment', value: (o) => paymentLabel(o) },
       { label: 'Delivered', value: (o) => (o.completedAt ? new Date(o.completedAt).toLocaleString('en-GB') : '') }
     ], filtered);
     toast(`Exported ${filtered.length} orders.`);
@@ -403,6 +406,7 @@ export default function Orders({ intent, clearIntent }) {
                     <td className="px-3 py-3">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <StatusBadge status={o.status} />
+                        {o.paymentMethod === 'WHISH' ? <span className="chip bg-accentSoft text-accent">Whish</span> : null}
                         {o.status === 'Pending' && ageDays(o) >= 2 ? (
                           <span className="chip bg-warnSoft text-warn" title="Waiting for more than 2 days">
                             <Clock className="h-3 w-3" /> {Math.floor(ageDays(o))}d

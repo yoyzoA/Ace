@@ -1,10 +1,11 @@
 export const siteConfig = {
   name: 'ACE Computers SARL',
-  tagline: 'Electronics and computer hardware in Batroun, Lebanon.',
+  tagline: 'Computers and games store in Batroun, Lebanon, since 1996.',
+  established: 1996,
   location: 'Hadadi Street, Batroun, Lebanon',
   phone: '+961 76 747 949',
   whatsapp: '96176747949',
-  email: 'tonyassal@hotmail.com',
+  email: 'acecomputerslb@gmail.com',
   logo: '/ace-logo.png',
   // Same logo with the surrounding whitespace trimmed, for the header and footer.
   logoMark: '/ace-logo-mark.png',
@@ -40,28 +41,29 @@ export const siteConfig = {
   navItems: [
     { label: 'Home', path: '/' },
     { label: 'Products', path: '/products' },
+    { label: 'Second-hand', path: '/second-hand' },
     { label: 'About', path: '/about' },
-    { label: 'FAQ', path: '/faq' },
     { label: 'Contact', path: '/contact' }
   ],
   footerLinks: [
     { label: 'Products', path: '/products' },
     { label: 'About & team', path: '/about' },
+    { label: 'Second-hand offer', path: '/second-hand' },
     { label: 'FAQ', path: '/faq' },
     { label: 'Contact & directions', path: '/contact' },
     { label: 'Privacy policy', path: '/privacy-policy' }
   ],
   hero: {
-    title: 'Computers, parts and gear, picked by people who know them.',
+    title: 'Computers, consoles and games, picked by people who know them.',
     subtitle:
-      'Laptops, components, monitors, networking and accessories from a Batroun store with more than 25 years of experience.',
+      'Laptops, consoles, games, PC parts and accessories from the computers and games store in Batroun, open since 1996.',
     primaryCta: { label: 'Browse catalog', path: '/products' },
     secondaryCta: { label: 'See featured gear', path: '/products?featured=true' }
   },
   services: [
     {
-      title: 'Cash on delivery',
-      text: 'Order online and pay when it reaches you. No card needed.'
+      title: 'Pay cash or with Whish',
+      text: 'Order online and pay cash when it reaches you, or pay with Whish. No card needed.'
     },
     {
       title: 'Pickup or delivery',

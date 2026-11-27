@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { FacebookIcon, InstagramIcon, TikTokIcon, WhatsAppIcon } from './BrandIcons';
 import { siteConfig } from '../data/siteConfig';
 import Logo from './Logo';
@@ -18,6 +18,9 @@ const Footer = () => (
           <Logo className="h-12" />
         </Link>
         <p className="text-sm text-muted">{siteConfig.tagline}</p>
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+          Established {siteConfig.established}
+        </p>
         <div className="flex gap-2">
           {socials.map(({ label, href, Icon }) => (
             <a
@@ -45,6 +48,16 @@ const Footer = () => (
           <li>
             <Link to="/products?featured=true" className="text-muted hover:text-accent">
               Featured gear
+            </Link>
+          </li>
+          <li>
+            <Link to="/products?collection=speakers" className="text-muted hover:text-accent">
+              Speakers
+            </Link>
+          </li>
+          <li>
+            <Link to="/second-hand" className="text-muted hover:text-accent">
+              Second-hand
             </Link>
           </li>
           <li>
@@ -104,6 +117,12 @@ const Footer = () => (
               WhatsApp us
             </a>
           </li>
+          <li>
+            <a href={`mailto:${siteConfig.email}`} className="flex gap-2.5 break-all text-muted hover:text-accent">
+              <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              {siteConfig.email}
+            </a>
+          </li>
         </ul>
         <p className="text-xs text-muted">{siteConfig.hoursNote}</p>
       </div>
@@ -111,7 +130,7 @@ const Footer = () => (
 
     <div className="border-t border-line">
       <div className="container flex flex-col items-center justify-between gap-2 py-5 text-xs text-muted md:flex-row">
-        <span>{`© ${new Date().getFullYear()} ${siteConfig.name}. All rights reserved.`}</span>
+        <span>{`© ${siteConfig.established}–${new Date().getFullYear()} ${siteConfig.name}. All rights reserved.`}</span>
         <Link to="/privacy-policy" className="hover:text-accent">
           Privacy policy
         </Link>

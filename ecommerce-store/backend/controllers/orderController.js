@@ -8,6 +8,8 @@ const MAX_LINES = 20; // different products in one order
 const MAX_QUANTITY = 10; // units of one product
 const MAX_PENDING_PER_PHONE = 3; // undelivered orders for one phone number
 const MAX_LENGTH = { name: 80, phone: 30, location: 300 };
+// How the customer will pay: cash (on delivery or pickup) or Whish.
+const PAYMENT_METHODS = ['COD', 'WHISH'];
 
 const createHttpError = (status, message) => {
   const error = new Error(message);
@@ -173,7 +175,7 @@ const createOrderWithTransaction = async (payload) => {
             subtotal,
             deliveryFee: DELIVERY_FEE,
             total,
-            paymentMethod: 'COD',
+            paymentMethod: payload.paymentMethod,
             status: 'Pending'
           }
         ],
@@ -221,7 +223,7 @@ const createOrderWithoutTransaction = async (payload) => {
       subtotal,
       deliveryFee: DELIVERY_FEE,
       total,
-      paymentMethod: 'COD',
+      paymentMethod: payload.paymentMethod,
       status: 'Pending'
     });
   } catch (error) {
@@ -306,10 +308,16 @@ const createOrder = async (req, res) => {
       return item.productId;
     });
 
+    const requestedPayment = String(req.body?.paymentMethod || 'COD').toUpperCase();
+    if (!PAYMENT_METHODS.includes(requestedPayment)) {
+      throw createHttpError(400, 'Choose cash or Whish as the payment method.');
+    }
+
     const payload = {
       customer,
       items,
-      productIds
+      productIds,
+      paymentMethod: requestedPayment
     };
 
     let order;
@@ -323,7 +331,7 @@ const createOrder = async (req, res) => {
       order = await createOrderWithoutTransaction(payload);
     }
 
-    return res.status(201).json({ orderId: order.id });
+    return res.status(201).json({ orderId: order.id, paymentMethod: order.paymentMethod });
   } catch (error) {
     const status = error.status || 500;
     return res.status(status).json({
