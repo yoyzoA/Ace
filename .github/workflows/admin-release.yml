@@ -1,0 +1,49 @@
+name: Release admin app
+
+# Builds the Windows installer whenever the admin app or admin server changes on main,
+# and publishes it as a GitHub release. Installed copies update themselves from it.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'admin-system/**'
+      - '.github/workflows/admin-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: admin-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install admin server packages
+        working-directory: admin-system/admin-backend
+        run: npm install --omit=dev --no-audit --no-fund
+
+      - name: Install admin app packages
+        working-directory: admin-system/admin-desktop-app
+        run: npm install --no-audit --no-fund
+
+      # Each release gets a higher version number, so installed apps know it's new.
+      - name: Set version
+        working-directory: admin-system/admin-desktop-app
+        run: npm version "1.0.${{ github.run_number }}" --no-git-tag-version --allow-same-version
+
+      - name: Build and publish
+        working-directory: admin-system/admin-desktop-app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run build
+          npx electron-builder --win --x64 --publish always
