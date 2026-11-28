@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const dns = require('dns');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
@@ -57,6 +58,26 @@ app.use((err, req, res, next) => {
   return res.status(status).json({ message });
 });
 
+// Some home and office routers can't answer the lookups a mongodb+srv:// link needs.
+// DNS_SERVERS=1.1.1.1,8.8.8.8 forces public DNS; otherwise we fall back to it on that error.
+const PUBLIC_DNS = ['1.1.1.1', '8.8.8.8'];
+const isDnsFailure = (error) =>
+  /querySrv|queryTxt|ENOTFOUND|ESERVFAIL|ETIMEOUT|ECONNREFUSED/.test(`${error?.code || ''} ${error?.message || ''}`) &&
+  /mongodb\+srv:/.test(MONGODB_URI);
+
+const connectDatabase = async () => {
+  if (process.env.DNS_SERVERS) dns.setServers(process.env.DNS_SERVERS.split(',').map((s) => s.trim()));
+  const options = { serverSelectionTimeoutMS: 15000 };
+  try {
+    await mongoose.connect(MONGODB_URI, options);
+  } catch (error) {
+    if (!isDnsFailure(error) || process.env.DNS_SERVERS) throw error;
+    console.error('Database lookup failed with this network\'s DNS; retrying with public DNS.');
+    dns.setServers(PUBLIC_DNS);
+    await mongoose.connect(MONGODB_URI, options);
+  }
+};
+
 const startServer = async () => {
   try {
     if (!MONGODB_URI) {
@@ -69,7 +90,7 @@ const startServer = async () => {
       throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set');
     }
 
-    await mongoose.connect(MONGODB_URI);
+    await connectDatabase();
     // Only this computer can reach the admin server, not others on the same Wi-Fi.
     const HOST = process.env.HOST || '127.0.0.1';
     app.listen(PORT, HOST, () => {
