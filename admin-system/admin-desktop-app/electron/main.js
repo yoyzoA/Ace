@@ -3,6 +3,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const settings = require('./settings');
+const updater = require('./updater');
 
 let backendProcess = null;
 let mainWindow = null;
@@ -78,8 +79,10 @@ const startBackend = () => {
     process.stderr.write(chunk);
   });
 
-  backendProcess.on('exit', (code, signal) => {
-    backendProcess = null;
+  const thisProcess = backendProcess;
+  thisProcess.on('exit', (code, signal) => {
+    if (backendProcess === thisProcess) backendProcess = null;
+    if (thisProcess.stoppedOnPurpose) return;
     if (code !== null && code !== 0) {
       console.error(`Admin backend exited with code ${code}.`);
       const detail = backendLog.split(/\r?\n/).filter((line) => /error|Error|failed/.test(line)).slice(-3).join('\n');
@@ -107,8 +110,8 @@ const startBackend = () => {
     }
   });
 
-  backendProcess.on('error', (error) => {
-    backendProcess = null;
+  thisProcess.on('error', (error) => {
+    if (backendProcess === thisProcess) backendProcess = null;
     console.error('Failed to start admin backend.', error);
   });
 };
@@ -120,6 +123,7 @@ const stopBackend = () =>
       resolve();
       return;
     }
+    backendProcess.stoppedOnPurpose = true;
     backendProcess.once('exit', () => resolve());
     backendProcess.kill();
     backendProcess = null;
@@ -218,6 +222,8 @@ const registerIpcHandlers = () => {
   });
 
   ipcMain.handle('settings:open', () => openSetupWindow());
+  ipcMain.handle('app:version', () => app.getVersion());
+  ipcMain.handle('updates:check', () => updater.check(true));
 
   // Current values for the setup form. The password and signing key stay hidden.
   ipcMain.handle('setup:load', () => {
@@ -286,6 +292,8 @@ app.whenReady().then(() => {
     openSetupWindow();
   }
 
+  updater.init({ window: () => mainWindow, onBeforeInstall: stopBackend });
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -299,6 +307,9 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('before-quit', () => {
-  stopBackend();
+// Wait for the admin server to stop before quitting, so an update can replace its files.
+app.on('before-quit', (event) => {
+  if (!backendProcess) return;
+  event.preventDefault();
+  stopBackend().then(() => app.quit());
 });

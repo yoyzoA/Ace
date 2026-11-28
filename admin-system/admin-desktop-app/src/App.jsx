@@ -21,6 +21,24 @@ import { ConfirmProvider, ToastProvider } from './components/ui';
 import { DataProvider, useData } from './store';
 import { clearToken, getToken, MOCK_MODE, setUnauthorizedHandler } from './api/adminApi';
 
+
+// Installed version, with a link to check GitHub for a newer one.
+const AppVersion = () => {
+  const [version, setVersion] = useState('');
+  useEffect(() => {
+    window.adminShell?.getVersion?.().then(setVersion).catch(() => {});
+  }, []);
+  if (!version) return null;
+  return (
+    <p className="flex items-center justify-between px-3 py-1 text-[11px] text-white/40">
+      <span>Version {version}</span>
+      <button type="button" onClick={() => window.adminShell.checkForUpdates()} className="font-semibold text-white/60 hover:text-white">
+        Check for updates
+      </button>
+    </p>
+  );
+};
+
 const PAGES = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'products', label: 'Products', icon: Package },
@@ -181,6 +199,7 @@ function Shell({ onLogout }) {
           <ThemeIcon className="h-[18px] w-[18px]" aria-hidden="true" />
           {themeLabel[theme]}
         </button>
+        <AppVersion />
         <button
           type="button"
           onClick={onLogout}
