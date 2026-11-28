@@ -8,6 +8,30 @@ let backendProcess = null;
 let mainWindow = null;
 let setupWindow = null;
 const BACKEND_PORT = '4000';
+let backendLog = '';
+
+// Turns the admin server's startup error into something a person can act on.
+const explainBackendFailure = (log) => {
+  if (/IP that isn't whitelisted|not authorized|whitelist|ReplicaSetNoPrimary|Server selection timed out|MongoServerSelectionError/i.test(log)) {
+    return "The app couldn't connect to the database. Most often this computer's internet address isn't allowed in MongoDB Atlas: open Atlas, go to Network Access and add your current IP address. Also check that you're online.";
+  }
+  if (/bad auth|Authentication failed/i.test(log)) {
+    return 'The database rejected the username or password in the database link. Open Settings and paste the correct database connection string.';
+  }
+  if (/querySrv|queryTxt|ENOTFOUND|ESERVFAIL|ETIMEOUT/i.test(log)) {
+    return "The app couldn't look up the database address. Check that you're online, then try again.";
+  }
+  if (/MONGODB_URI|JWT_SECRET|ADMIN_EMAIL|ADMIN_PASSWORD/.test(log)) {
+    return 'Some settings are missing. Open Settings and fill them in.';
+  }
+  if (/EADDRINUSE/.test(log)) {
+    return 'Another copy of the admin server is already running. Close every ACE Admin window (and any "npm start" window for the admin server), then open the app again.';
+  }
+  if (/Cannot find module/.test(log)) {
+    return 'The app is missing some of its files. Reinstall ACE Admin.';
+  }
+  return 'The admin server stopped while starting.';
+};
 
 const resolveBackendPath = () => {
   if (app.isPackaged) {
@@ -35,17 +59,49 @@ const startBackend = () => {
     ELECTRON_RUN_AS_NODE: '1'
   };
 
+  backendLog = '';
   backendProcess = spawn(process.execPath, [entryPoint], {
     cwd: backendPath,
     env,
-    stdio: 'inherit',
+    stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true
+  });
+  const keepLog = (chunk) => {
+    backendLog = (backendLog + chunk.toString()).slice(-4000);
+  };
+  backendProcess.stdout.on('data', (chunk) => {
+    keepLog(chunk);
+    process.stdout.write(chunk);
+  });
+  backendProcess.stderr.on('data', (chunk) => {
+    keepLog(chunk);
+    process.stderr.write(chunk);
   });
 
   backendProcess.on('exit', (code, signal) => {
     backendProcess = null;
     if (code !== null && code !== 0) {
       console.error(`Admin backend exited with code ${code}.`);
+      const detail = backendLog.split(/\r?\n/).filter((line) => /error|Error|failed/.test(line)).slice(-3).join('\n');
+      dialog
+        .showMessageBox(mainWindow || undefined, {
+          type: 'error',
+          title: 'ACE Admin',
+          message: explainBackendFailure(backendLog),
+          detail: detail ? `Details:\n${detail.slice(0, 600)}` : undefined,
+          buttons: ['Try again', 'Open settings', 'Close'],
+          defaultId: 0,
+          cancelId: 2
+        })
+        .then(({ response }) => {
+          if (response === 0) {
+            startBackend();
+            setTimeout(() => mainWindow?.reload(), 4000);
+          } else if (response === 1) {
+            openSetupWindow();
+          }
+        })
+        .catch(() => {});
     } else if (signal) {
       console.error(`Admin backend exited with signal ${signal}.`);
     }
