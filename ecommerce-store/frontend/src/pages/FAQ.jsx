@@ -8,7 +8,8 @@ import { siteConfig } from '../data/siteConfig';
 const faqs = [
   {
     question: 'What payment methods do you accept?',
-    answer: 'We currently accept Cash on Delivery for online orders placed through the site.'
+    answer:
+      'Pay cash when your order arrives (or when you pick it up), or pay with Whish. Choose at checkout; for Whish we send you the payment details on WhatsApp after you order.'
   },
   {
     question: 'Do you offer delivery or in-store pickup?',

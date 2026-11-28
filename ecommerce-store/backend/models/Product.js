@@ -21,6 +21,8 @@ const productSchema = new mongoose.Schema(
     featured: { type: Boolean, default: false },
     // false = hidden from the public website (still visible in the admin app)
     published: { type: Boolean, default: true },
+    // 'used' = second-hand item, shown in the Second-hand offer
+    condition: { type: String, enum: ['new', 'used'], default: 'new' },
     stock: { type: Number, default: 0, min: 0 },
     reserved: { type: Number, default: 0, min: 0 }
   },

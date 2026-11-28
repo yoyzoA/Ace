@@ -30,13 +30,13 @@ export default {
         ink: '#231f20',
         muted: '#5e6166',
         // Logo palette
-        brand: '#24aae1',
-        brandSoft: '#e3f4fb',
+        brand: '#3d7ff5',
+        brandSoft: '#e8effd',
         silver: '#bcbdc0',
         charcoal: '#231f20',
-        // Interactive blue (logo blue, deepened for readable text/buttons)
-        accent: '#0a76ab',
-        accentHover: '#086a9b',
+        // Interactive blue: the logo's royal blue (readable on white)
+        accent: '#014fda',
+        accentHover: '#0143b8',
         // Warnings (out of stock, errors)
         accentWarm: '#b4461b',
         success: '#1f7a4d'
@@ -47,7 +47,7 @@ export default {
       },
       boxShadow: {
         card: '0 1px 2px rgba(35, 31, 32, 0.04), 0 8px 24px -12px rgba(35, 31, 32, 0.12)',
-        lift: '0 2px 4px rgba(35, 31, 32, 0.04), 0 18px 40px -16px rgba(10, 118, 171, 0.28)',
+        lift: '0 2px 4px rgba(35, 31, 32, 0.04), 0 18px 40px -16px rgba(1, 79, 218, 0.26)',
         panel: '0 1px 2px rgba(35, 31, 32, 0.04)'
       },
       borderRadius: {

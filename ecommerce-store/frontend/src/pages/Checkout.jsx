@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Banknote, ImageOff, Lock, ShoppingBag } from 'lucide-react';
+import { Banknote, ImageOff, Lock, ShoppingBag, Smartphone } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { getProducts, placeOrder } from '../services/api';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -20,6 +20,7 @@ const Checkout = () => {
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [payment, setPayment] = useState('COD');
   const [formValues, setFormValues] = useState({
     name: '',
     phone: '',
@@ -116,7 +117,8 @@ const Checkout = () => {
         items: cartItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity
-        }))
+        })),
+        paymentMethod: payment
       };
 
       const response = await placeOrder(payload);
@@ -125,7 +127,7 @@ const Checkout = () => {
         throw new Error('Order placed but no order ID was returned.');
       }
       clearCart();
-      navigate(`/order-success/${orderId}`, { replace: true });
+      navigate(`/order-success/${orderId}${payment === 'WHISH' ? '?pay=whish' : ''}`, { replace: true });
     } catch (submitError) {
       setError(submitError?.message || 'Failed to place order.');
     } finally {
@@ -232,12 +234,44 @@ const Checkout = () => {
 
           <section className="space-y-4">
             <h2 className="font-display text-xl font-semibold text-ink">Payment</h2>
-            <div className="flex items-start gap-4 rounded-2xl border-2 border-accent bg-brandSoft/50 p-4">
-              <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
-              <div>
-                <p className="font-semibold text-ink">Cash on delivery</p>
-                <p className="text-sm text-muted">Pay in cash when your order arrives.</p>
-              </div>
+            <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Payment method">
+              {[
+                {
+                  id: 'COD',
+                  Icon: Banknote,
+                  title: 'Cash',
+                  text: 'Pay in cash when your order arrives or when you pick it up.'
+                },
+                {
+                  id: 'WHISH',
+                  Icon: Smartphone,
+                  title: 'Whish',
+                  text: 'After you order, we send you our Whish payment details on WhatsApp.'
+                }
+              ].map(({ id, Icon, title, text }) => (
+                <label
+                  key={id}
+                  className={`flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition-colors ${
+                    payment === id ? 'border-accent bg-brandSoft/50' : 'border-line hover:border-accent/40'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value={id}
+                    checked={payment === id}
+                    onChange={() => setPayment(id)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-[#014fda]"
+                  />
+                  <span>
+                    <span className="flex items-center gap-2 font-semibold text-ink">
+                      <Icon className="h-4 w-4 text-accent" aria-hidden="true" />
+                      {title}
+                    </span>
+                    <span className="mt-0.5 block text-sm text-muted">{text}</span>
+                  </span>
+                </label>
+              ))}
             </div>
           </section>
 

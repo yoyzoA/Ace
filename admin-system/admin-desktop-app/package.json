@@ -60,7 +60,8 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "signAndEditExecutable": false
     }
   }
 }

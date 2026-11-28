@@ -9,6 +9,7 @@ import { formatPrice } from '../utils/formatters';
 import { getAvailableStock } from '../utils/inventory';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { usePageStatus } from '../hooks/usePageStatus';
+import { getCollection } from '../data/collections';
 
 const defaultFilters = {
   search: '',
@@ -17,7 +18,8 @@ const defaultFilters = {
   brand: 'all',
   priceRange: null,
   featured: false,
-  inStock: false
+  inStock: false,
+  collection: null
 };
 
 const sortOptions = [
@@ -30,7 +32,8 @@ const sortOptions = [
 const filtersFromParams = (searchParams) => ({
   search: searchParams.get('search') || '',
   category: searchParams.get('category') || 'all',
-  featured: searchParams.get('featured') === 'true'
+  featured: searchParams.get('featured') === 'true',
+  collection: getCollection(searchParams.get('collection'))?.id || null
 });
 
 const Products = () => {
@@ -45,7 +48,7 @@ const Products = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   usePageMeta({
-    title: filters.category !== 'all' ? filters.category : 'Products',
+    title: getCollection(filters.collection)?.label || (filters.category !== 'all' ? filters.category : 'Products'),
     description:
       'Browse laptops, components, monitors, networking and accessories by brand, category and price. Compare specs at a glance.'
   });
@@ -156,6 +159,8 @@ const Products = () => {
       const matchesBrand = filters.brand === 'all' || product.brand === filters.brand;
       const matchesFeatured = !filters.featured || product.featured;
       const matchesStock = !filters.inStock || getAvailableStock(product) > 0;
+      const collection = getCollection(filters.collection);
+      const matchesCollection = !collection || collection.test(product);
       const matchesPrice =
         !filters.priceRange ||
         (product.price >= filters.priceRange.min && product.price <= filters.priceRange.max);
@@ -167,7 +172,8 @@ const Products = () => {
         matchesBrand &&
         matchesPrice &&
         matchesFeatured &&
-        matchesStock
+        matchesStock &&
+        matchesCollection
       );
     });
 
@@ -247,6 +253,13 @@ const Products = () => {
           filters.priceRange.max >= priceBounds.max ? '+' : ''
         }`,
         onClear: () => handleFilterChange('priceRange', null)
+      });
+    }
+    if (filters.collection) {
+      tags.push({
+        key: 'collection',
+        label: getCollection(filters.collection)?.label,
+        onClear: () => setFilters((prev) => ({ ...prev, collection: null }))
       });
     }
     if (filters.featured) {

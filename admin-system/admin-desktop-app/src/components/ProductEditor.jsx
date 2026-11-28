@@ -14,6 +14,7 @@ const blank = {
   description: '',
   featured: false,
   published: true,
+  condition: 'new',
   images: [],
   specs: []
 };
@@ -28,6 +29,7 @@ const fromProduct = (p) => ({
   description: p.description || '',
   featured: Boolean(p.featured),
   published: p.published !== false,
+  condition: p.condition === 'used' ? 'used' : 'new',
   images: Array.isArray(p.images) ? p.images.filter(Boolean) : [],
   specs: Array.isArray(p.specs) ? p.specs.map((s) => ({ label: s.label || '', value: s.value || '' })) : []
 });
@@ -217,6 +219,31 @@ export default function ProductEditor({
               <p className="text-xs text-muted">Shown on the home page.</p>
             </div>
             <Switch checked={form.featured} onChange={set('featured')} label="Featured" />
+          </div>
+        </div>
+
+        {/* Condition */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line p-3">
+          <div>
+            <p className="text-sm font-semibold text-ink">Condition</p>
+            <p className="text-xs text-muted">Second-hand items appear in the website's Second-hand offer.</p>
+          </div>
+          <div className="inline-flex rounded-lg border border-line p-0.5 text-sm font-semibold" role="radiogroup" aria-label="Condition">
+            {[
+              ['new', 'New'],
+              ['used', 'Second-hand']
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={form.condition === value}
+                onClick={() => setForm((f) => ({ ...f, condition: value }))}
+                className={`rounded-md px-3 py-1.5 ${form.condition === value ? 'bg-accent text-white' : 'text-muted hover:text-ink'}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 

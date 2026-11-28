@@ -52,6 +52,12 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    // 'used' = second-hand item, shown in the website's Second-hand offer
+    condition: {
+      type: String,
+      enum: ['new', 'used'],
+      default: 'new'
+    },
     stock: {
       type: Number,
       default: 0,

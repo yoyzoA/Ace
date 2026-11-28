@@ -28,6 +28,10 @@ export const timeAgo = (value) => {
 
 export const orderNumber = (order) => `#${String(order?._id || order?.id || '').slice(-6).toUpperCase()}`;
 
+// Matches the website: marked second-hand, or "USED" etc. in the name.
+const SECOND_HAND_NAME = /\b(used|2nd[\s-]?hand|second[\s-]?hand|refurb(ished)?|open[\s-]?box)\b/i;
+export const isSecondHand = (product) => product?.condition === 'used' || SECOND_HAND_NAME.test(product?.name || '');
+
 export const available = (product) => Math.max(0, Number(product?.stock || 0) - Number(product?.reserved || 0));
 
 export const phoneDigits = (value) => String(value || '').replace(/[^\d]/g, '');

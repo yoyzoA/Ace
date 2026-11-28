@@ -95,6 +95,7 @@ router.post('/', async (req, res) => {
     const price = normalizeNumber(req.body.price);
     const featured = normalizeBoolean(req.body.featured, false);
     const published = normalizeBoolean(req.body.published, true);
+    const condition = req.body.condition === 'used' ? 'used' : 'new';
     const images = normalizeImages(req.body.images);
     const specs = normalizeSpecs(req.body.specs);
     const stock = normalizeStock(req.body.stock);
@@ -118,6 +119,7 @@ router.post('/', async (req, res) => {
       images,
       featured,
       published,
+      condition,
       stock: stock === null ? 0 : stock
     });
 
@@ -128,7 +130,7 @@ router.post('/', async (req, res) => {
 });
 
 const MAX_BULK = 2000;
-const BULK_FIELDS = ['published', 'featured', 'category', 'subcategory', 'brand'];
+const BULK_FIELDS = ['published', 'featured', 'category', 'subcategory', 'brand', 'condition'];
 
 // Apply one change to many products at once, or delete them.
 // Body: { ids: [...], action: 'update' | 'delete', set: { published?, featured?, category?, subcategory?, brand? } }
@@ -162,6 +164,8 @@ router.post('/bulk', async (req, res) => {
       if (!hasOwn(input, field)) return;
       if (field === 'published' || field === 'featured') {
         set[field] = normalizeBoolean(input[field]);
+      } else if (field === 'condition') {
+        set[field] = input[field] === 'used' ? 'used' : 'new';
       } else {
         set[field] = normalizeString(input[field]);
       }
@@ -223,6 +227,10 @@ router.put('/:id', async (req, res) => {
 
     if (hasOwn(req.body, 'published')) {
       product.published = normalizeBoolean(req.body.published, product.published !== false);
+    }
+
+    if (hasOwn(req.body, 'condition')) {
+      product.condition = req.body.condition === 'used' ? 'used' : 'new';
     }
 
     if (hasOwn(req.body, 'images')) {

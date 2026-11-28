@@ -298,8 +298,8 @@ const ProductDetails = () => {
                 <li className="flex gap-3">
                   <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.75} aria-hidden="true" />
                   <span>
-                    <span className="block font-semibold text-ink">Cash on delivery</span>
-                    <span className="text-muted">Pay when your order arrives.</span>
+                    <span className="block font-semibold text-ink">Pay cash or with Whish</span>
+                    <span className="text-muted">Cash when your order arrives, or Whish. No card needed.</span>
                   </span>
                 </li>
                 <li className="flex gap-3">

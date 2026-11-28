@@ -27,7 +27,7 @@ export default function Login({ onSuccess }) {
     <div className="grid min-h-full lg:grid-cols-[1fr_1.1fr]">
       <div className="relative hidden overflow-hidden bg-sidebar p-12 text-white lg:flex lg:flex-col">
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1.5"><img src="./ace-logo-mark.png" alt="" className="h-full w-full object-contain" /></span>
+          <span className="flex h-11 items-center rounded-xl bg-white px-3 py-2"><img src="./ace-logo-mark.png" alt="" className="h-full w-auto object-contain" /></span>
           <span className="font-display text-lg font-semibold">ACE Computers</span>
         </div>
         <div className="mt-auto max-w-md space-y-4">
@@ -48,7 +48,7 @@ export default function Login({ onSuccess }) {
       <div className="flex items-center justify-center p-6">
         <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-5">
           <div className="space-y-1 lg:hidden">
-            <img src="./ace-logo-mark.png" alt="" className="mb-4 h-10 w-10 object-contain" />
+            <img src="./ace-logo-mark.png" alt="" className="mb-4 h-9 w-auto object-contain" />
           </div>
           <div className="space-y-1">
             <h2 className="font-display text-2xl font-semibold text-ink">Sign in</h2>

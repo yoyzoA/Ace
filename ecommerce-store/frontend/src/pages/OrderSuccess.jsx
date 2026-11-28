@@ -1,16 +1,24 @@
-import { Link, useParams } from 'react-router-dom';
-import { Check, Phone } from 'lucide-react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Check, Phone, Smartphone } from 'lucide-react';
+import { WhatsAppIcon } from '../components/BrandIcons';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { siteConfig } from '../data/siteConfig';
 
-const steps = [
+const stepsFor = (whish) => [
   { title: 'Order received', text: 'Your order is in our system.' },
-  { title: 'We call to confirm', text: 'The ACE team calls the number you gave us.' },
-  { title: 'Delivery or pickup', text: 'Pay in cash when you receive it.' }
+  whish
+    ? { title: 'Pay with Whish', text: 'We send our Whish details on WhatsApp. Send the total there.' }
+    : { title: 'We call to confirm', text: 'The ACE team calls the number you gave us.' },
+  { title: 'Delivery or pickup', text: whish ? 'We confirm your payment, then deliver or keep it ready for pickup.' : 'Pay in cash when you receive it.' }
 ];
 
 const OrderSuccess = () => {
   const { id } = useParams();
+  const [params] = useSearchParams();
+  const whish = params.get('pay') === 'whish';
+  const steps = stepsFor(whish);
+  const shortNumber = `#${String(id || '').slice(-6).toUpperCase()}`;
+  const whishMessage = `Hello ACE, I placed order ${shortNumber} on the website and want to pay with Whish.`;
 
   usePageMeta({
     title: 'Order placed',
@@ -29,10 +37,31 @@ const OrderSuccess = () => {
           {id ? (
             <p className="inline-flex items-center gap-2 rounded-full bg-mist px-4 py-2 text-sm text-muted">
               Order number
-              <span className="font-semibold text-ink">{id}</span>
+              <span className="font-semibold text-ink">{shortNumber}</span>
             </p>
           ) : null}
         </div>
+
+        {whish ? (
+          <div className="flex flex-col gap-4 rounded-2xl border-2 border-accent bg-brandSoft/50 p-5 sm:flex-row sm:items-center">
+            <Smartphone className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-ink">You chose to pay with Whish</p>
+              <p className="text-sm text-muted">
+                Message us on WhatsApp with your order number {shortNumber} and we&apos;ll send the Whish details.
+              </p>
+            </div>
+            <a
+              href={`https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(whishMessage)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-primary shrink-0 px-5 py-2.5"
+            >
+              <WhatsAppIcon className="h-4 w-4" />
+              WhatsApp us
+            </a>
+          </div>
+        ) : null}
 
         {/* A real sequence, so numbered steps fit here */}
         <ol className="grid gap-4 sm:grid-cols-3">
